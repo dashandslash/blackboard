@@ -1,0 +1,5 @@
+## OSX artifacts
+.DS_Store
+
+.build/
+.build_r/
