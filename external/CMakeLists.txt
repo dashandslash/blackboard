@@ -8,16 +8,6 @@ set( BGFX_CUSTOM_TARGETS  OFF CACHE INTERNAL "" )
 add_subdirectory( bgfx.cmake )
 # bgfx>
 
-# <entt
-add_subdirectory( entt )
-# enttt>
-# <glm
-add_subdirectory( glm )
-# glm>
-# <range-v3
-add_subdirectory( range-v3 )
-# range-v3>
-
 # <ImGui
 set(imgui_DIR ${CMAKE_CURRENT_SOURCE_DIR}/imgui)
 set(imgui_SOURCES

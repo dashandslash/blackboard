@@ -1,24 +1,9 @@
 [submodule "external/bgfx.cmake"]
 	path = external/bgfx.cmake
 	url = git@github.com:dashandslash/bgfx.cmake.git
-[submodule ".b/external/entt"]
-	path = .b/external/entt
-	url = https://github.com/skypjack/entt.git
-[submodule ".b/external/imgui"]
-	path = .b/external/imgui
-	url = https://github.com/ocornut/imgui.git
 [submodule "external/imgui"]
 	path = external/imgui
 	url = https://github.com/ocornut/imgui.git
-[submodule "external/entt"]
-	path = external/entt
-	url = https://github.com/skypjack/entt.git
-[submodule "external/glm"]
-	path = external/glm
-	url = https://github.com/g-truc/glm.git
-[submodule "external/range-v3"]
-	path = external/range-v3
-	url = https://github.com/ericniebler/range-v3.git
 [submodule "external/SDL"]
 	path = external/SDL
 	url = https://github.com/libsdl-org/SDL.git

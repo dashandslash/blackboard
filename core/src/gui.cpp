@@ -4,7 +4,6 @@
 
 #include <bgfx/bgfx.h>
 #include <bgfx/platform.h>
-#include <entt/entt.hpp>
 #include <imgui/backends/imgui_impl_sdl.h>
 #include <SDL.h>
 #include <SDL_syswm.h>

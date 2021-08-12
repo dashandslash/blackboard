@@ -20,7 +20,6 @@ add_library(${PROJECT_NAME} STATIC ${HEADERS} ${SOURCES})
 target_link_libraries(${PROJECT_NAME}
                       PRIVATE
                       bgfx
-                      EnTT
                       ImGui
                       SDL2-static
                       )
