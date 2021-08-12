@@ -33,15 +33,15 @@ bool init(SDL_Window* window, const uint16_t width, const uint16_t height)
     pd.backBufferDS = NULL;
     bgfx::Init bgfx_init;
     bgfx_init.type = bgfx::RendererType::Count; // auto choose renderer
-    bgfx_init.resolution.width = width * 1;
-    bgfx_init.resolution.height = height * 1;
-    bgfx_init.resolution.numBackBuffers = 2;
+    bgfx_init.resolution.width = width;
+    bgfx_init.resolution.height = height;
+    bgfx_init.resolution.numBackBuffers = 1;
     bgfx_init.platformData = pd;
     bgfx_init.resolution.reset = BGFX_RESET_VSYNC;
     bgfx::init(bgfx_init);
     bgfx::setDebug(BGFX_DEBUG_TEXT);
     bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x000000FF, 1.0f, 0);
-    bgfx::setViewRect(0, 0, 0, width * 1, height * 1);
+    bgfx::setViewRect(0, 0, 0, width, height);
     
     return true;
 }
