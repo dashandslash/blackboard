@@ -7,6 +7,8 @@
 #include <imgui/backends/imgui_impl_sdl.h>
 #include <SDL.h>
 
+static const uint16_t imgui_view_id{255};
+
 namespace blackboard
 {
 App::App(const char* app_name)
@@ -41,8 +43,8 @@ void App::run()
                             m_window.height = height;
                             SDL_SetWindowSize(m_window.main_window.get(), width, height);
                             bgfx::reset(width, height, BGFX_RESET_VSYNC);
-                            bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x000000FF, 1.0f, 0);
-                            bgfx::setViewRect(0, 0, 0, width, height);
+                            bgfx::setViewClear(imgui_view_id, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x000000FF, 1.0f, 0);
+                            bgfx::setViewRect(imgui_view_id, 0, 0, width, height);
                         }
                     }
             }
@@ -55,7 +57,7 @@ void App::run()
         update();
         
         ImGui::Render();
-        renderer::ImGui_Impl_sdl_bgfx_Render(255, ImGui::GetDrawData(), 0);
+        renderer::ImGui_Impl_sdl_bgfx_Render(imgui_view_id, ImGui::GetDrawData(), 0);
         
         if (const auto io = ImGui::GetIO(); io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
         {
