@@ -2,6 +2,8 @@
 
 #include <imgui/imgui.h>
 
+#include <iostream>
+
 void dockspace()
 {
     static bool opt_fullscreen = true;
@@ -70,17 +72,23 @@ void dockspace()
     ImGui::End();
 }
 
-class Basic_app : public blackboard::App
+class Basic_app : public blackboard::BaseApp
 {
 public:
-    Basic_app(const char* title) : blackboard::App(title)
+    Basic_app(const char* title) : blackboard::BaseApp(title)
     {
     }
     
     void update() override
     {
-        dockspace();
-        ImGui::ShowDemoWindow();
+        if (m_window.window) {
+            dockspace();
+            ImGui::ShowDemoWindow();
+        }
+        else
+        {
+            std::cout << "Headless update" << std::endl;
+        }
     }
 };
 

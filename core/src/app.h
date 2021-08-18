@@ -5,6 +5,7 @@
 
 namespace blackboard
 {
+template<Render_api T>
 class App
 {
 public:
@@ -13,9 +14,21 @@ public:
     ~App();
     virtual void update() = 0;
     void run();
-private:
-    gui::Window_data m_window;
+protected:
+    Window<SDL_Window> m_window;
+    bool running{true};
+    uint32_t update_rate{16};
 };
+
+//#define BLACKBOARD_HEADLESS
+
+#ifndef BLACKBOARD_HEADLESS
+#ifdef __APPLE__
+using BaseApp = blackboard::App<blackboard::Render_api::metal>;
+#endif
+#else
+using BaseApp = blackboard::App<blackboard::Render_api::none>;
+#endif
 
 #define BLACKBOARD_APP(APP, APP_NAME) \
 int main( int argc, char* argv[] ) \
@@ -24,5 +37,4 @@ int main( int argc, char* argv[] ) \
     app.run(); \
     return 0; \
 }
-
 }

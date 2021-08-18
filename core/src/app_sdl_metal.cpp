@@ -7,44 +7,45 @@
 #include <imgui/backends/imgui_impl_sdl.h>
 #include <SDL.h>
 
-static const uint16_t imgui_view_id{255};
+#include <iostream>
 
 namespace blackboard
 {
-App::App(const char* app_name)
+template<> App<Render_api::metal>::App(const char* app_name)
 {
-    m_window = gui::init(app_name);
-    if(m_window.main_window)
+    init<SDL_Window, metal>(m_window);
+    if(m_window.window)
     {
-        renderer::init(m_window.main_window.get(), m_window.width, m_window.height);
+        renderer::init(m_window.window, m_window.width, m_window.height);
+        renderer::ImGui_Impl_sdl_bgfx_Init(m_window.imgui_view_id);
     }
 }
 
-void App::run()
+template<> void App<Render_api::metal>::run()
 {
     SDL_Event event;
-    bool done = false;
-    while (!done)
+    while (running)
     {
         while (SDL_PollEvent(&event))
         {
-            if(m_window.main_window)
+            if(m_window.window)
             {
                 ImGui_ImplSDL2_ProcessEvent(&event);
+                std::cout << event.type << std::endl;
                 if (event.type == SDL_QUIT)
-                    done = true;
-                if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(m_window.main_window.get()))
-                    done = true;
+                    running = false;
+                if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(m_window.window))
+                    running = false;
                 if(event.type == SDL_WINDOWEVENT) {
                         if(event.window.event == SDL_WINDOWEVENT_RESIZED) {
                             const auto width = event.window.data1;
                             const auto height = event.window.data2;
                             m_window.width = width;
                             m_window.height = height;
-                            SDL_SetWindowSize(m_window.main_window.get(), width, height);
+                            SDL_SetWindowSize(m_window.window, width, height);
                             bgfx::reset(width, height, BGFX_RESET_VSYNC);
-                            bgfx::setViewClear(imgui_view_id, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x000000FF, 1.0f, 0);
-                            bgfx::setViewRect(imgui_view_id, 0, 0, width, height);
+                            bgfx::setViewClear(m_window.imgui_view_id, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x000000FF, 1.0f, 0);
+                            bgfx::setViewRect(m_window.imgui_view_id, 0, 0, width, height);
                         }
                     }
             }
@@ -57,7 +58,7 @@ void App::run()
         update();
         
         ImGui::Render();
-        renderer::ImGui_Impl_sdl_bgfx_Render(imgui_view_id, ImGui::GetDrawData(), 0);
+        renderer::ImGui_Impl_sdl_bgfx_Render(m_window.imgui_view_id, ImGui::GetDrawData(), 0x000000FF);
         
         if (const auto io = ImGui::GetIO(); io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
         {
@@ -69,7 +70,7 @@ void App::run()
     }
 }
     
-App::~App()
+template<> App<Render_api::metal>::~App()
 {
     ImGui_ImplSDL2_Shutdown();
     renderer::ImGui_Impl_sdl_bgfx_Shutdown();
@@ -77,7 +78,7 @@ App::~App()
     ImGui::DestroyContext();
     bgfx::shutdown();
 
-    SDL_DestroyWindow(m_window.main_window.get());
+    SDL_DestroyWindow(m_window.window);
     SDL_Quit();
 }
 }

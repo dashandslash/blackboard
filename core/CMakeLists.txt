@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 3.21)
 project(core)
 
 set(SOURCES
-    src/app.cpp
+    src/app_headless.cpp
+    src/app_sdl_metal.cpp
     src/gui.cpp
     src/renderer/platform/imgui_impl_sdl_bgfx.cpp
     src/renderer/renderer.cpp

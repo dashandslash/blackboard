@@ -8,6 +8,8 @@
 #include <SDL.h>
 #include <SDL_syswm.h>
 
+#include <iostream>
+
 
 namespace blackboard
 {
@@ -19,9 +21,7 @@ bool init(SDL_Window* window, const uint16_t width, const uint16_t height)
     SDL_SysWMinfo wmi;
     SDL_VERSION(&wmi.version);
     if (!SDL_GetWindowWMInfo(window, &wmi)) {
-        printf(
-            "SDL_SysWMinfo could not be retrieved. SDL_Error: %s\n",
-            SDL_GetError());
+        std::cout << "SDL_SysWMinfo could not be retrieved. SDL_Error: " << SDL_GetError() << std::endl;
         return false;
     }
 

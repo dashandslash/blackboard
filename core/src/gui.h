@@ -7,16 +7,23 @@ struct SDL_Window;
 
 namespace blackboard
 {
-namespace gui
-{
 
-struct Window_data
-{
-    std::unique_ptr<SDL_Window, std::function<void(SDL_Window *)>> main_window;
-    uint16_t width{1280u};
-    uint16_t height{720u};
+enum Render_api {
+    none = 0,
+    metal,
+    d3d11
 };
 
-Window_data init(const std::string &window_title) noexcept;
-}
+template<typename WindowType>
+struct Window
+{
+    uint16_t width{1280u};
+    uint16_t height{720u};
+    std::string title{"title"};
+    uint16_t imgui_view_id{255};
+    WindowType *window;
+};
+
+template<typename WindowType, Render_api T>
+void init(Window<WindowType> &);
 }

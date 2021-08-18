@@ -8,8 +8,10 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 include_directories(external)
 include_directories(external/imgui)
+include_directories(external/bgfx.cmake/bx/include)
 include_directories(${PROJECT_SOURCE_DIR})
 
 add_subdirectory(example)
 add_subdirectory(core)
 add_subdirectory(external)
+add_subdirectory(engine_meta)
