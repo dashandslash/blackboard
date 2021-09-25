@@ -1,4 +1,5 @@
 #include <core/src/app.h>
+#include <core/src/gui.h>
 
 #include <imgui/imgui.h>
 
@@ -72,24 +73,61 @@ void dockspace()
     ImGui::End();
 }
 
-class Basic_app : public blackboard::BaseApp
+void set_dark_theme()
 {
-public:
-    Basic_app(const char* title) : blackboard::BaseApp(title)
-    {
-    }
-    
-    void update() override
-    {
-        if (m_window.window) {
-            dockspace();
-            ImGui::ShowDemoWindow();
-        }
-        else
-        {
-            std::cout << "Headless update" << std::endl;
-        }
-    }
-};
+    auto& colors = ImGui::GetStyle().Colors;
+    colors[ImGuiCol_WindowBg] = ImVec4{ 0.1f, 0.1f, 0.11f, 1.0f };
 
-BLACKBOARD_APP(Basic_app, "Example App");
+    // Headers
+    colors[ImGuiCol_Header] = ImVec4{ 0.2f, 0.2f, 0.21f, 1.0f };
+    colors[ImGuiCol_HeaderHovered] = ImVec4{ 0.3f, 0.3f, 0.31f, 1.0f };
+    colors[ImGuiCol_HeaderActive] = ImVec4{ 0.15f, 0.15f, 0.15f, 1.0f };
+    
+    // Buttons
+    colors[ImGuiCol_Button] = ImVec4{ 0.2f, 0.2f, 0.21f, 1.0f };
+    colors[ImGuiCol_ButtonHovered] = ImVec4{ 0.3f, 0.3f, 0.31f, 1.0f };
+    colors[ImGuiCol_ButtonActive] = ImVec4{ 0.15f, 0.15f, 0.15f, 1.0f };
+
+    // Frame BG
+    colors[ImGuiCol_FrameBg] = ImVec4{ 0.2f, 0.2f, 0.21f, 1.0f };
+    colors[ImGuiCol_FrameBgHovered] = ImVec4{ 0.3f, 0.3f, 0.31f, 1.0f };
+    colors[ImGuiCol_FrameBgActive] = ImVec4{ 0.15f, 0.15f, 0.15f, 1.0f };
+
+    // Tabs
+    colors[ImGuiCol_Tab] = ImVec4{ 0.15f, 0.15f, 0.15f, 1.0f };
+    colors[ImGuiCol_TabHovered] = ImVec4{ 0.38f, 0.38f, 0.38f, 1.0f };
+    colors[ImGuiCol_TabActive] = ImVec4{ 0.28f, 0.28f, 0.28f, 1.0f };
+    colors[ImGuiCol_TabUnfocused] = ImVec4{ 0.15f, 0.15f, 0.15f, 1.0f };
+    colors[ImGuiCol_TabUnfocusedActive] = ImVec4{ 0.2f, 0.2f, 0.21f, 1.0f };
+
+    // Title
+    colors[ImGuiCol_TitleBg] = ImVec4{ 0.15f, 0.15f, 0.15f, 1.0f };
+    colors[ImGuiCol_TitleBgActive] = ImVec4{ 0.15f, 0.15f, 0.15f, 1.0f };
+    colors[ImGuiCol_TitleBgCollapsed] = ImVec4{ 0.15f, 0.15f, 0.15f, 1.0f};
+}
+
+void update()
+{
+    dockspace();
+    ImGui::ShowDemoWindow();
+}
+
+int main( int argc, char* argv[] )
+{
+    static const std::string headless_arg{"headless"};
+    if (argc > 1 && std::string(argv[1]) == headless_arg )
+    {
+        blackboard::App<blackboard::Render_api::none> app(headless_arg.c_str());
+        app.update = [](){std::cout << "Headless update" << std::endl;};
+        app.run();
+    }
+    else
+    {
+        blackboard::App<blackboard::Render_api::metal> app("Example SDL+Metal");
+        set_dark_theme();
+        app.update = update;
+        app.run();
+    }
+
+    return 0;
+}

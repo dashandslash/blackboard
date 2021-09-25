@@ -13,6 +13,7 @@ namespace blackboard
 {
 template<> App<Render_api::metal>::App(const char* app_name)
 {
+    m_window.title = app_name;
     init<SDL_Window, metal>(m_window);
     if(m_window.window)
     {
@@ -31,7 +32,6 @@ template<> void App<Render_api::metal>::run()
             if(m_window.window)
             {
                 ImGui_ImplSDL2_ProcessEvent(&event);
-                std::cout << event.type << std::endl;
                 if (event.type == SDL_QUIT)
                     running = false;
                 if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(m_window.window))
@@ -54,7 +54,6 @@ template<> void App<Render_api::metal>::run()
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
         
-        // call to virtual update function
         update();
         
         ImGui::Render();
