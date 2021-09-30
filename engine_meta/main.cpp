@@ -10,12 +10,17 @@ moodycamel::ConcurrentQueue<entt::meta_any> queue;
 void update()
 {
     entt::meta_any any_item;
+
     while(queue.try_dequeue(any_item))
     {
-        using namespace entt::literals;
-        any_item.invoke("execute"_hs, any_item.invoke("get"_hs).as_ref());
-    }
+        auto range = entt::resolve();
 
+        using namespace entt::literals;
+        std::string executor_str("execute_");
+        executor_str.append(any_item.type().info().name());
+        auto hashed_executor_str = entt::hashed_string{executor_str.c_str()};
+        any_item.invoke(hashed_executor_str, any_item.data());
+    }
 }
 
 int main( int argc, char* argv[] )

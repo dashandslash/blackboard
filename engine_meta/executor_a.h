@@ -6,9 +6,9 @@
 #include <iostream>
 
 namespace a {
-
-void execute(Action &a)
+void execute(void *meta_action)
 {
-    std::cout << entt::type_id<Action>().name() << " has value: " << a.value <<std::endl;
+    auto action = (Action*)meta_action;
+    std::cout << entt::type_id<Action>().name() << " has value: " << action->value <<std::endl;
 }
 }

@@ -12,15 +12,18 @@
 #include <entt/meta/template.hpp>
 #include <concurrentqueue.h>
 
-template<typename A, void free_function(A&)>
+template<typename A, void free_function(void*)>
 void register_action()
 {
     using namespace entt::literals;
     auto hashed_name = entt::hashed_string{std::string(entt::type_id<A>().name()).c_str()};
     entt::meta<A>().type(hashed_name);
     entt::meta<A>().template data<&A::value>("value"_hs);
-    entt::meta<A>().template func<&A::get>("get"_hs);
-    entt::meta<A>().template func<free_function>("execute"_hs);
+
+    std::string executor_str("execute_");
+    executor_str.append(entt::type_id<A>().name());
+    auto hashed_executor_str = entt::hashed_string{executor_str.c_str()};
+    entt::meta<A>().template func<free_function>(hashed_executor_str);
 }
 
 struct Module
