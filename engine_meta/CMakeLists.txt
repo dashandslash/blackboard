@@ -20,7 +20,12 @@ FetchContent_MakeAvailable(EnTT)
     FetchContent_MakeAvailable(concurrentqueue)
 
 set(SOURCES
-    example.cpp
+    main.cpp
+    action_a.h
+    action_b.h
+    executor_a.h
+    executor_b.h
+    module.h
     )
 
 set(HEADERS 
