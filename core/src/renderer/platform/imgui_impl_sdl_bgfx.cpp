@@ -102,7 +102,8 @@ static void ImguiBgfxOnCreateWindow(ImGuiViewport* viewport) {
     data->width = bx::max<uint16_t>((uint16_t)viewport->Size.x, 1);
     data->height = bx::max<uint16_t>((uint16_t)viewport->Size.y, 1);
     // Create frame buffer
-    data->frameBufferHandle = bgfx::createFrameBuffer(native_window_handle((SDL_Window*)viewport->PlatformHandle), data->width, data->height);
+    
+    data->frameBufferHandle = bgfx::createFrameBuffer(native_window_handle((SDL_Window*)viewport->PlatformHandle), data->width * viewport->DrawData->FramebufferScale.x, data->height * viewport->DrawData->FramebufferScale.y);
     // Set frame buffer
     bgfx::setViewFrameBuffer(data->viewId, data->frameBufferHandle);
 }
@@ -147,6 +148,12 @@ void ImGui_Impl_sdl_bgfx_Render(const bgfx::ViewId view_id, ImDrawData* draw_dat
     bgfx::setViewName(view_id, "ImGui");
     bgfx::setViewMode(view_id, bgfx::ViewMode::Sequential);
 
+    
+    // (0,0) unless using multi-viewports
+    const ImVec2 clipPos = draw_data->DisplayPos;
+    // (1,1) unless using retina display which are often (2,2)
+    const ImVec2 clipScale = draw_data->FramebufferScale;
+    
     const bgfx::Caps *caps = bgfx::getCaps();
     {
         const auto L = draw_data->DisplayPos.x;
@@ -156,14 +163,10 @@ void ImGui_Impl_sdl_bgfx_Render(const bgfx::ViewId view_id, ImDrawData* draw_dat
         float ortho[16];
         bx::mtxOrtho(ortho, L, R, B, T, 0.0f, 1000.0f, 0.0f, bgfx::getCaps()->homogeneousDepth);
         bgfx::setViewTransform(view_id, nullptr, ortho);
-        bgfx::setViewRect(view_id, 0, 0, (uint16_t)draw_data->DisplaySize.x, (uint16_t)draw_data->DisplaySize.y);
+        bgfx::setViewRect(view_id, 0, 0, (uint16_t)draw_data->DisplaySize.x * clipScale.x, (uint16_t)draw_data->DisplaySize.y * clipScale.y);
     }
     
-    // (0,0) unless using multi-viewports
-    const ImVec2 clipPos = draw_data->DisplayPos;
-    // (1,1) unless using retina display which are often (2,2)
-    const ImVec2 clipScale = draw_data->FramebufferScale;
-
+//    draw_data->ScaleClipRects(clipScale);
     // Render command lists
     for (int32_t ii = 0, num = draw_data->CmdListsCount; ii < num; ++ii) {
         bgfx::TransientVertexBuffer tvb;
@@ -233,19 +236,27 @@ void ImGui_Impl_sdl_bgfx_Render(const bgfx::ViewId view_id, ImDrawData* draw_dat
                 clipRect.y = (cmd->ClipRect.y - clipPos.y) * clipScale.y;
                 clipRect.z = (cmd->ClipRect.z - clipPos.x) * clipScale.x;
                 clipRect.w = (cmd->ClipRect.w - clipPos.y) * clipScale.y;
+                int fb_width = (int)(draw_data->DisplaySize.x * draw_data->FramebufferScale.x);
+                int fb_height = (int)(draw_data->DisplaySize.y * draw_data->FramebufferScale.y);
+                
+//                if (clipRect.x <  fb_width
+//                &&  clipRect.y <  fb_height
+//                &&  clipRect.z >= 0.0f
+//                &&  clipRect.w >= 0.0f)
+                {
+                    const auto position = draw_data->DisplayPos;
+                    const uint16_t x(bx::max(cmd->ClipRect.x, 0.0f) - position.x);
+                    const uint16_t y(bx::max(cmd->ClipRect.y, 0.0f) - position.y);
+                    const uint16_t width(bx::min(cmd->ClipRect.z, 65535.0f) - position.x - x);
+                    const uint16_t height(bx::min(cmd->ClipRect.w, 65535.0f) - position.y - y);
+                    encoder->setScissor(x* clipScale.x, y* clipScale.x, width* clipScale.x, height* clipScale.x);
 
-                const auto position = draw_data->DisplayPos;
-                const uint16_t xx0(bx::max(cmd->ClipRect.x, 0.0f) - position.x);
-                const uint16_t yy0(bx::max(cmd->ClipRect.y, 0.0f) - position.y);
-                const uint16_t xx1(bx::max(cmd->ClipRect.z, 0.0f) - position.x);
-                const uint16_t yy1(bx::max(cmd->ClipRect.w, 0.0f) - position.y);
-                encoder->setScissor(xx0, yy0, xx1, yy1);
-
-                encoder->setState(state);
-                encoder->setTexture(0, uniform_texture, texture_handle, sampler_state);
-                encoder->setVertexBuffer(0, &tvb, 0, numVertices);
-                encoder->setIndexBuffer(&tib, offset, cmd->ElemCount);
-                encoder->submit(view_id, program);
+                    encoder->setState(state);
+                    encoder->setTexture(0, uniform_texture, texture_handle, sampler_state);
+                    encoder->setVertexBuffer(0, &tvb, 0, numVertices);
+                    encoder->setIndexBuffer(&tib, offset, cmd->ElemCount);
+                    encoder->submit(view_id, program);
+                }
             }
 
             offset += cmd->ElemCount;

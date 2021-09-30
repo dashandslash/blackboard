@@ -11,7 +11,7 @@
 
 namespace blackboard
 {
-template<> App<Render_api::metal>::App(const char* app_name)
+template<> App<Render_api::metal>::App(const char* app_name, const uint16_t width, const uint16_t height)
 {
     m_window.title = app_name;
     init<SDL_Window, metal>(m_window);
@@ -43,9 +43,14 @@ template<> void App<Render_api::metal>::run()
                             m_window.width = width;
                             m_window.height = height;
                             SDL_SetWindowSize(m_window.window, width, height);
-                            bgfx::reset(width, height, BGFX_RESET_VSYNC);
+                            ImGuiIO& io = ImGui::GetIO();
+                            int drawable_width{0};
+                            int drawable_height{0};
+                            SDL_GL_GetDrawableSize(SDL_GetWindowFromID(event.window.windowID), &drawable_width, &drawable_height);
+                            io.DisplaySize = ImVec2((float)drawable_width, (float)drawable_height);
+                            bgfx::reset(drawable_width, drawable_height, BGFX_RESET_VSYNC | BGFX_RESET_HIDPI);
                             bgfx::setViewClear(m_window.imgui_view_id, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x000000FF, 1.0f, 0);
-                            bgfx::setViewRect(m_window.imgui_view_id, 0, 0, width, height);
+                            bgfx::setViewRect(m_window.imgui_view_id, 0, 0, drawable_width, drawable_height);
                         }
                     }
             }
@@ -53,7 +58,7 @@ template<> void App<Render_api::metal>::run()
         renderer::ImGui_Impl_sdl_bgfx_NewFrame();
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
-        
+
         update();
         
         ImGui::Render();

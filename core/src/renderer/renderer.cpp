@@ -33,11 +33,14 @@ bool init(SDL_Window* window, const uint16_t width, const uint16_t height)
     pd.backBufferDS = NULL;
     bgfx::Init bgfx_init;
     bgfx_init.type = bgfx::RendererType::Count; // auto choose renderer
-    bgfx_init.resolution.width = width;
-    bgfx_init.resolution.height = height;
+    int width_{0};
+    int height_{0};
+    SDL_GL_GetDrawableSize(window, &width_, &height_);
+    bgfx_init.resolution.width = width_;
+    bgfx_init.resolution.height = height_;
     bgfx_init.resolution.numBackBuffers = 1;
     bgfx_init.platformData = pd;
-    bgfx_init.resolution.reset = BGFX_RESET_VSYNC;
+    bgfx_init.resolution.reset = BGFX_RESET_VSYNC | BGFX_RESET_HIDPI;
     bgfx::init(bgfx_init);
     bgfx::setDebug(BGFX_DEBUG_TEXT);
     bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x000000FF, 1.0f, 0);

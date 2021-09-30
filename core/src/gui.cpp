@@ -14,7 +14,7 @@ namespace blackboard
 {
 void create_window(Window<SDL_Window> &window)
 {
-    window.window = SDL_CreateWindow(window.title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, window.width, window.height, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+    window.window = SDL_CreateWindow(window.title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, window.width, window.height, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
 }
 
 bool init_ui()

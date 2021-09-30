@@ -6,7 +6,7 @@
 
 namespace blackboard
 {
-template<> App<Render_api::none>::App(const char* app_name)
+template<> App<Render_api::none>::App(const char* app_name, const uint16_t width, const uint16_t height)
 {
 }
 

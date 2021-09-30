@@ -11,7 +11,7 @@ class App
 {
 public:
     App() = delete;
-    explicit App(const char* app_name);
+    explicit App(const char* app_name, const uint16_t width = 1280u, const uint16_t height = 720u);
     ~App();
     void run();
     std::function<void()> update{[](){ std::cout << "update function not defined" << std::endl; }};
