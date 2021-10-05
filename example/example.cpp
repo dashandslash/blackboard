@@ -3,6 +3,7 @@
 
 #include <imgui/imgui.h>
 
+#include <filesystem>
 #include <iostream>
 
 void dockspace()
@@ -104,6 +105,27 @@ void set_dark_theme()
     colors[ImGuiCol_TitleBg] = ImVec4{ 0.15f, 0.15f, 0.15f, 1.0f };
     colors[ImGuiCol_TitleBgActive] = ImVec4{ 0.15f, 0.15f, 0.15f, 1.0f };
     colors[ImGuiCol_TitleBgCollapsed] = ImVec4{ 0.15f, 0.15f, 0.15f, 1.0f};
+    
+    ImFontConfig font_config;
+    font_config.RasterizerMultiply = 1.15f;
+    font_config.OversampleH = 4;
+    font_config.OversampleV = 4;
+    auto &io = ImGui::GetIO();
+
+    const auto fonts_directory = std::filesystem::current_path() / "assets/fonts/";
+
+    for (const auto &font_file : std::filesystem::recursive_directory_iterator{fonts_directory})
+    {
+        if (font_file.path().extension().string() == ".ttf")
+        {
+            io.Fonts->AddFontFromFileTTF(font_file.path().c_str(), 14, &font_config);
+        }
+        // setup my favourite font
+        if (font_file.path().stem() == "Roboto-Regular")
+        {
+            io.FontDefault = io.Fonts->Fonts.back();
+        }
+    }
 }
 
 void update()
