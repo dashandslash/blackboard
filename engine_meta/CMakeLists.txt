@@ -23,8 +23,10 @@ set(SOURCES
     main.cpp
     action_a.h
     action_b.h
+    action_m.h
     executor_a.h
     executor_b.h
+    executor_m.h
     module.h
     module.cpp
     )

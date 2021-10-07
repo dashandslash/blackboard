@@ -2,8 +2,10 @@
 
 #include "action_a.h"
 #include "action_b.h"
+#include "action_m.h"
 #include "executor_a.h"
 #include "executor_b.h"
+#include "executor_m.h"
 
 #include <chrono>
 #include <thread>
@@ -32,12 +34,14 @@ Module::Module(moodycamel::ConcurrentQueue<entt::meta_any> &_queue):queue(_queue
 {
     register_action<a::Action, a::execute>();
     register_action<b::Action, b::execute>();
+    register_action<m::Action, m::execute>();
 
     action_pusher = std::thread([&](){
         using namespace std::chrono_literals;
         while (push_actions) {
             queue.enqueue(a::Action{50});
             queue.enqueue(b::Action{20});
+            queue.enqueue(m::Action{std::make_unique<int>(10)});
 //            queue.enqueue(std::string("ouch!"));
             std::this_thread::sleep_for(500ms);
         }
