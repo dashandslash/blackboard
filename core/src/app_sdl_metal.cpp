@@ -73,6 +73,11 @@ template<> void App<Render_api::metal>::run()
         bgfx::frame();
     }
 }
+
+template<> std::filesystem::path App<Render_api::metal>::get_app_path()
+{
+    return {SDL_GetBasePath()};
+}
     
 template<> App<Render_api::metal>::~App()
 {

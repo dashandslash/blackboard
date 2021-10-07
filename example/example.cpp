@@ -6,6 +6,8 @@
 #include <filesystem>
 #include <iostream>
 
+std::filesystem::path app_path;
+
 void dockspace()
 {
     static bool opt_fullscreen = true;
@@ -112,7 +114,7 @@ void set_dark_theme()
     font_config.OversampleV = 4;
     auto &io = ImGui::GetIO();
 
-    const auto fonts_directory = std::filesystem::current_path() / "assets/fonts/";
+    const auto fonts_directory = app_path / "assets/fonts/";
 
     for (const auto &font_file : std::filesystem::recursive_directory_iterator{fonts_directory})
     {
@@ -146,6 +148,8 @@ int main( int argc, char* argv[] )
     else
     {
         blackboard::App<blackboard::Render_api::metal> app("Example SDL+Metal");
+        app_path = app.get_app_path();
+        
         set_dark_theme();
         app.update = update;
         app.run();

@@ -1,6 +1,7 @@
 #pragma once
 #include "gui.h"
 
+#include <filesystem>
 #include <iostream>
 #include <string>
 
@@ -15,6 +16,7 @@ public:
     ~App();
     void run();
     std::function<void()> update{[](){ std::cout << "update function not defined" << std::endl; }};
+    virtual std::filesystem::path get_app_path(){return {"/"};}
 protected:
     Window<SDL_Window> m_window;
     bool running{true};
