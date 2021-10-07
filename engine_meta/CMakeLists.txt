@@ -26,6 +26,7 @@ set(SOURCES
     executor_a.h
     executor_b.h
     module.h
+    module.cpp
     )
 
 set(HEADERS 
