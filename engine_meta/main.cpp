@@ -13,13 +13,25 @@ void update()
 
     while(queue.try_dequeue(any_item))
     {
-        auto range = entt::resolve();
-
-        using namespace entt::literals;
         std::string executor_str("execute_");
         executor_str.append(any_item.type().info().name());
         auto hashed_executor_str = entt::hashed_string{executor_str.c_str()};
-        any_item.invoke(hashed_executor_str, any_item.data());
+        
+        const auto meta_action = entt::resolve(any_item.type().info());
+        if (!meta_action)
+        {
+            std::cout << "Unkown action type: " << any_item.type().info().name() << std::endl;
+            return;
+        }
+
+        const auto meta_executor = meta_action.func(hashed_executor_str);
+        if (!meta_executor)
+        {
+            std::cout << "Unkown function type: " << hashed_executor_str.data() << std::endl;
+            return;
+        }
+
+        meta_executor.invoke(hashed_executor_str, any_item.data());
     }
 }
 
