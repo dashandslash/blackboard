@@ -59,7 +59,7 @@ template<> void App<Render_api::metal>::run()
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
 
-        update();
+        on_update();
         
         ImGui::Render();
         renderer::ImGui_Impl_sdl_bgfx_Render(m_window.imgui_view_id, ImGui::GetDrawData(), 0x000000FF);

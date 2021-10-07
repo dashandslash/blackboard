@@ -15,7 +15,7 @@ public:
     explicit App(const char* app_name, const uint16_t width = 1280u, const uint16_t height = 720u);
     ~App();
     void run();
-    std::function<void()> update{[](){ std::cout << "update function not defined" << std::endl; }};
+    std::function<void()> on_update{[](){ std::cout << "update function not defined" << std::endl; }};
     virtual std::filesystem::path get_app_path(){return {"/"};}
 protected:
     Window<SDL_Window> m_window;

@@ -142,16 +142,18 @@ int main( int argc, char* argv[] )
     if (argc > 1 && std::string(argv[1]) == headless_arg )
     {
         blackboard::App<blackboard::Render_api::none> app(headless_arg.c_str());
-        app.update = [](){std::cout << "Headless update" << std::endl;};
+        app.on_update = [](){std::cout << "Headless update" << std::endl;};
         app.run();
     }
     else
     {
         blackboard::App<blackboard::Render_api::metal> app("Example SDL+Metal");
+        
+        app.on_update = update;
         app_path = app.get_app_path();
         
         set_dark_theme();
-        app.update = update;
+        
         app.run();
     }
 
