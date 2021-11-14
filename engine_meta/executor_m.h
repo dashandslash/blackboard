@@ -6,11 +6,8 @@
 #include <iostream>
 
 namespace m {
-void execute(void *meta_action)
+void execute(const Action &action)
 {
-    auto action = (Action*)meta_action;
-    
-    std::unique_ptr<int> value = std::move(action->value);
-    std::cout << entt::type_id<Action>().name() << " has value: " << *value <<std::endl;
+    std::cout << entt::type_id<Action>().name() << " has value: " << action.value.get() <<std::endl;
 }
 }

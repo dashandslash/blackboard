@@ -31,7 +31,10 @@ void update()
             return;
         }
 
-        meta_executor.invoke(hashed_executor_str, any_item.data());
+        if(auto is_invoked = meta_executor.invoke(hashed_executor_str, any_item.as_ref()); !is_invoked)
+        {
+            std::cout << "Function not invoked! " << hashed_executor_str.data() << std::endl;
+        }
     }
 }
 

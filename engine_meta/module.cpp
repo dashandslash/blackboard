@@ -15,7 +15,7 @@
 #include <concurrentqueue.h>
 
 
-template<typename A, void free_function(void*)>
+template<typename A, void free_function(const A&)>
 void register_action()
 {
     using namespace entt::literals;

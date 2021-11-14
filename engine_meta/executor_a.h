@@ -6,9 +6,8 @@
 #include <iostream>
 
 namespace a {
-void execute(void *meta_action)
+void execute(const Action &action)
 {
-    auto action = (Action*)meta_action;
-    std::cout << entt::type_id<Action>().name() << " has value: " << action->value <<std::endl;
+    std::cout << entt::type_id<Action>().name() << " has value: " << action.value <<std::endl;
 }
 }
