@@ -3,56 +3,46 @@
 #include "renderer/platform/imgui_impl_sdl_bgfx.h"
 #include "renderer/renderer.h"
 
+#include <SDL.h>
 #include <bgfx/bgfx.h>
 #include <imgui/backends/imgui_impl_sdl.h>
-#include <SDL.h>
 
 #include <iostream>
 
-namespace blackboard
-{
-template<> App<Render_api::metal>::App(const char* app_name, const uint16_t width, const uint16_t height)
+namespace blackboard {
+template<>
+App<Render_api::metal>::App(const char *app_name, const uint16_t width, const uint16_t height)
 {
     m_window.title = app_name;
     init<SDL_Window, metal>(m_window);
-    if(m_window.window)
+    if (m_window.window)
     {
         renderer::init(m_window.window, m_window.width, m_window.height);
         renderer::ImGui_Impl_sdl_bgfx_Init(m_window.imgui_view_id);
     }
 }
 
-template<> void App<Render_api::metal>::run()
+template<>
+void App<Render_api::metal>::run()
 {
     SDL_Event event;
     while (running)
     {
-        while (SDL_PollEvent(&event))
+        while (m_window.window != nullptr && SDL_PollEvent(&event))
         {
-            if(m_window.window)
+            ImGui_ImplSDL2_ProcessEvent(&event);
+            if (event.type == SDL_QUIT)
+                running = false;
+            if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE &&
+                event.window.windowID == SDL_GetWindowID(m_window.window))
+                running = false;
+            if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESIZED)
             {
-                ImGui_ImplSDL2_ProcessEvent(&event);
-                if (event.type == SDL_QUIT)
-                    running = false;
-                if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(m_window.window))
-                    running = false;
-                if(event.type == SDL_WINDOWEVENT) {
-                        if(event.window.event == SDL_WINDOWEVENT_RESIZED) {
-                            const auto width = event.window.data1;
-                            const auto height = event.window.data2;
-                            m_window.width = width;
-                            m_window.height = height;
-                            SDL_SetWindowSize(m_window.window, width, height);
-                            ImGuiIO& io = ImGui::GetIO();
-                            int drawable_width{0};
-                            int drawable_height{0};
-                            SDL_GL_GetDrawableSize(SDL_GetWindowFromID(event.window.windowID), &drawable_width, &drawable_height);
-                            io.DisplaySize = ImVec2((float)drawable_width, (float)drawable_height);
-                            bgfx::reset(drawable_width, drawable_height, BGFX_RESET_VSYNC | BGFX_RESET_HIDPI);
-                            bgfx::setViewClear(m_window.imgui_view_id, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x000000FF, 1.0f, 0);
-                            bgfx::setViewRect(m_window.imgui_view_id, 0, 0, drawable_width, drawable_height);
-                        }
-                    }
+                const auto width = event.window.data1;
+                const auto height = event.window.data2;
+                m_window.width = width;
+                m_window.height = height;
+                renderer::ImGui_Impl_sdl_bgfx_Resize(SDL_GetWindowFromID(event.window.windowID));
             }
         }
         renderer::ImGui_Impl_sdl_bgfx_NewFrame();
@@ -60,26 +50,34 @@ template<> void App<Render_api::metal>::run()
         ImGui::NewFrame();
 
         on_update();
-        
+
         ImGui::Render();
         renderer::ImGui_Impl_sdl_bgfx_Render(m_window.imgui_view_id, ImGui::GetDrawData(), 0x000000FF);
-        
+
         if (const auto io = ImGui::GetIO(); io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
         {
             ImGui::UpdatePlatformWindows();
             ImGui::RenderPlatformWindowsDefault();
         }
-        bgfx::touch(0);
+
         bgfx::frame();
     }
 }
 
-template<> std::filesystem::path App<Render_api::metal>::get_app_path()
+template<>
+std::filesystem::path App<Render_api::metal>::get_app_path()
 {
-    return {SDL_GetBasePath()};
+    char *base_path = SDL_GetBasePath();
+    if (base_path)
+    {
+        return {SDL_GetBasePath()};
+    }
+
+    return {"./"};
 }
-    
-template<> App<Render_api::metal>::~App()
+
+template<>
+App<Render_api::metal>::~App()
 {
     ImGui_ImplSDL2_Shutdown();
     renderer::ImGui_Impl_sdl_bgfx_Shutdown();
@@ -90,4 +88,4 @@ template<> App<Render_api::metal>::~App()
     SDL_DestroyWindow(m_window.window);
     SDL_Quit();
 }
-}
+}    // namespace blackboard

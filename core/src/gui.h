@@ -5,10 +5,10 @@
 
 struct SDL_Window;
 
-namespace blackboard
-{
+namespace blackboard {
 
-enum Render_api {
+enum Render_api
+{
     none = 0,
     metal,
     d3d11
@@ -26,4 +26,4 @@ struct Window
 
 template<typename WindowType, Render_api T>
 void init(Window<WindowType> &);
-}
+}    // namespace blackboard
