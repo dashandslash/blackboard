@@ -15,8 +15,8 @@ void create_window(gui::Window<SDL_Window> &window)
 {
     window.window = SDL_CreateWindow(
       window.title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, window.width, window.height,
-      window.fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP :
-                          0 | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+      (window.fullscreen ? (SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_BORDERLESS) : SDL_WINDOW_SHOWN) |
+        SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
 }
 
 template<>
