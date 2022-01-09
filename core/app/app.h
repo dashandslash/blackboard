@@ -1,12 +1,15 @@
 #pragma once
-#include "gui.h"
+
+#include "gui/gui.h"
+#include "renderer/renderer.h"
 
 #include <filesystem>
 #include <iostream>
 #include <string>
 
 namespace blackboard {
-template<Render_api T>
+
+template<renderer::Api RendererApi, typename WindowType>
 class App
 {
 public:
@@ -18,8 +21,12 @@ public:
     virtual std::filesystem::path get_app_path() { return {"/"}; }
 
 protected:
-    Window<SDL_Window> m_window;
-    bool running{true};
-    uint32_t update_rate{16};
+    gui::Window<WindowType> m_window;
+    bool m_running{true};
+    uint32_t m_update_rate{16};
+    static const decltype(RendererApi) m_renderer_api;
 };
+
+using App_sdl_metal = App<renderer::Api::metal, SDL_Window>;
+using App_headless = App<renderer::Api::none, void>;
 }    // namespace blackboard

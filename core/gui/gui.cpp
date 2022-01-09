@@ -9,15 +9,8 @@
 
 #include <iostream>
 
-namespace blackboard {
-void create_window(Window<SDL_Window> &window)
-{
-    window.window = SDL_CreateWindow(
-      window.title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, window.width, window.height,
-      SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-}
-
-bool init_ui()
+namespace blackboard::gui {
+void init()
 {
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
@@ -42,20 +35,5 @@ bool init_ui()
         style.FrameBorderSize = 0.f;
         style.FramePadding = ImVec2(0.f, 0.f);
     }
-    return true;
 }
-
-template<>
-void init<SDL_Window, metal>(Window<SDL_Window> &window)
-{
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) != 0)
-    {
-        std::cout << "Error: " << SDL_GetError() << std::endl;
-    }
-
-    SDL_SetHint(SDL_HINT_RENDER_DRIVER, "metal");
-    create_window(window);
-    init_ui();
-    ImGui_ImplSDL2_InitForMetal(window.window);
-}
-}    // namespace blackboard
+}    // namespace blackboard::gui

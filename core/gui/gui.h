@@ -5,14 +5,7 @@
 
 struct SDL_Window;
 
-namespace blackboard {
-
-enum Render_api
-{
-    none = 0,
-    metal,
-    d3d11
-};
+namespace blackboard::gui {
 
 template<typename WindowType>
 struct Window
@@ -24,6 +17,5 @@ struct Window
     WindowType *window;
 };
 
-template<typename WindowType, Render_api T>
-void init(Window<WindowType> &);
-}    // namespace blackboard
+void init();
+}    // namespace blackboard::gui

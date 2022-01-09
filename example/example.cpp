@@ -1,6 +1,5 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
-#include <core/src/app.h>
-#include <core/src/gui.h>
+#include <core/app/app.h>
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
@@ -244,13 +243,13 @@ int main(int argc, char *argv[])
     static const std::string headless_arg{"headless"};
     if (argc > 1 && std::string(argv[1]) == headless_arg)
     {
-        blackboard::App<blackboard::Render_api::none> app(headless_arg.c_str());
+        blackboard::App_headless app(headless_arg.c_str());
         app.on_update = []() { std::cout << "Headless update" << std::endl; };
         app.run();
     }
     else
     {
-        blackboard::App<blackboard::Render_api::metal> app("Example SDL+Metal");
+        blackboard::App_sdl_metal app("Example SDL+Metal");
         app.on_update = update;
         app_path = app.get_app_path();
         std::cout << app_path << std::endl;
