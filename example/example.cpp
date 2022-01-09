@@ -249,7 +249,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-        blackboard::App_sdl_metal app("Example SDL+Metal");
+        blackboard::App_sdl_metal app("Example SDL+Metal", 1280, 720, true);
         app.on_update = update;
         app_path = app.get_app_path();
         std::cout << app_path << std::endl;

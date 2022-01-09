@@ -6,7 +6,8 @@
 
 namespace blackboard {
 template<>
-App_headless::App(const char *app_name, const uint16_t width, const uint16_t height)
+App_headless::App(const char *app_name, const uint16_t width, const uint16_t height,
+                  const bool fullscreen)
 {}
 
 template<>

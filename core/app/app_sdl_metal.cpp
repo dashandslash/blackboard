@@ -15,26 +15,31 @@ void create_window(gui::Window<SDL_Window> &window)
 {
     window.window = SDL_CreateWindow(
       window.title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, window.width, window.height,
-      SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+      window.fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP :
+                          0 | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
 }
 
 template<>
-App_sdl_metal::App(const char *app_name, const uint16_t width, const uint16_t height)
+App_sdl_metal::App(const char *app_name, const uint16_t width, const uint16_t height,
+                   const bool fullscreen)
 {
-    m_window.title = app_name;
-
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) != 0)
     {
         std::cout << "Error: " << SDL_GetError() << std::endl;
     }
 
+    m_window.title = app_name;
+    m_window.width = width;
+    m_window.height = height;
+    m_window.fullscreen = fullscreen;
+
     SDL_SetHint(SDL_HINT_RENDER_DRIVER, "metal");
     create_window(m_window);
-    
+
     gui::init();
 
     ImGui_ImplSDL2_InitForMetal(m_window.window);
-    
+
     if (m_window.window)
     {
         renderer::init(m_window.window, m_window.width, m_window.height);

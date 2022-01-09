@@ -14,7 +14,8 @@ class App
 {
 public:
     App() = delete;
-    explicit App(const char *app_name, const uint16_t width = 1280u, const uint16_t height = 720u);
+    explicit App(const char *app_name, const uint16_t width = 1280u, const uint16_t height = 720u,
+                 const bool fullscreen = false);
     ~App();
     void run();
     std::function<void()> on_update{[]() { std::cout << "update function not defined" << std::endl; }};

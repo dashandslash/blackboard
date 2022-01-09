@@ -15,5 +15,5 @@ enum class Api : uint8_t
 };
 
 bool init(SDL_Window *window, const uint16_t width, const uint16_t height);
-}
+}    // namespace renderer
 }    // namespace blackboard
