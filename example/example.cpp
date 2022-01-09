@@ -13,27 +13,26 @@ std::filesystem::path app_path;
 
 void set_dracula_theme()
 {
-    static constexpr auto max = 255.0f;
-    auto &colors = ImGui::GetStyle().Colors;
-    colors[ImGuiCol_WindowBg] = ImVec4{0.1f, 0.1f, 0.11f, 1.0f};
-
     ImGui::StyleColorsDark();
+    auto &colors = ImGui::GetStyle().Colors;
 
-    ImVec4 Titlebar = ImVec4(36.0f / max, 38.0f / max, 48.0f / max, 1.0f);
-    ImVec4 TabActive = ImVec4(40.0f / max, 42.0f / max, 54.0f / max, 1.0f);
-    ImVec4 TabUnactive = ImVec4(35.0f / max, 43.0f / max, 59.0f / max, 1.0f);
+    ImVec4 Titlebar = ImVec4(0.14f, 0.15f, 0.188f, 1.0f);
+    ImVec4 TabActive = ImVec4(0.157f, 0.165f, 0.212f, 1.0f);
+    ImVec4 TabUnactive = ImVec4(0.137f, 0.168f, 0.23f, 1.0f);
 
-    const auto IconColour = ImVec4(183.0f / 255.0f, 158.0f / 255.0f, 220.0f / 255.0f, 1.00f);
-    colors[ImGuiCol_Text] = ImVec4(159.0f / 255.0f, 159.0f / 255.0f, 163.0f / 255.0f, 1.00f);
+    const auto IconColour = ImVec4(0.718, 0.62f, 0.86f, 1.00f);
+    colors[ImGuiCol_Text] = ImVec4(0.718, 0.62f, 0.64f, 1.00f);
     colors[ImGuiCol_TextDisabled] = ImVec4(0.36f, 0.42f, 0.47f, 1.00f);
 
-    colors[ImGuiCol_WindowBg] = TabActive;
-    colors[ImGuiCol_ChildBg] = TabActive;
+    colors[ImGuiCol_WindowBg] = ImVec4{0.1f, 0.1f, 0.11f, 1.0f};
+    ;
+    colors[ImGuiCol_ChildBg] = ImVec4{0.1f, 0.1f, 0.11f, 1.0f};
+    ;
 
-    colors[ImGuiCol_PopupBg] = ImVec4(42.0f / 255.0f, 38.0f / 255.0f, 47.0f / 255.0f, 1.00f);
+    colors[ImGuiCol_PopupBg] = ImVec4(0.1065f, 0.15f, 0.184f, 1.00f);
     colors[ImGuiCol_Border] = ImVec4(0.08f, 0.10f, 0.12f, 1.00f);
     colors[ImGuiCol_BorderShadow] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
-    colors[ImGuiCol_FrameBg] = ImVec4(65.0f / 255.0f, 79.0f / 255.0f, 92.0f / 255.0f, 1.00f);
+    colors[ImGuiCol_FrameBg] = ImVec4(0.255f, 0.31f, 0.36f, 1.00f);
     colors[ImGuiCol_FrameBgHovered] = ImVec4(0.12f, 0.20f, 0.28f, 1.00f);
     colors[ImGuiCol_FrameBgActive] = ImVec4(0.09f, 0.12f, 0.14f, 1.00f);
 
@@ -69,6 +68,7 @@ void set_dracula_theme()
     colors[ImGuiCol_PlotHistogramHovered] = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
     colors[ImGuiCol_TextSelectedBg] = ImVec4(0.26f, 0.59f, 0.98f, 0.35f);
     colors[ImGuiCol_DragDropTarget] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
+
     colors[ImGuiCol_NavHighlight] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
     colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
     colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
@@ -77,10 +77,7 @@ void set_dracula_theme()
     colors[ImGuiCol_Header] = TabActive + ImVec4(0.1f, 0.1f, 0.1f, 0.1f);
     colors[ImGuiCol_HeaderHovered] = TabActive + ImVec4(0.1f, 0.1f, 0.1f, 0.1f);
     colors[ImGuiCol_HeaderActive] = TabActive + ImVec4(0.05f, 0.05f, 0.05f, 0.1f);
-
     colors[ImGuiCol_HeaderActive] = TabActive + ImVec4(0.05f, 0.05f, 0.05f, 0.1f);
-
-#ifdef IMGUI_HAS_DOCK
 
     colors[ImGuiCol_Tab] = TabUnactive;
     colors[ImGuiCol_TabHovered] = TabActive + ImVec4(0.1f, 0.1f, 0.1f, 0.1f);
@@ -89,23 +86,6 @@ void set_dracula_theme()
     colors[ImGuiCol_TabUnfocusedActive] = TabActive;
     colors[ImGuiCol_DockingEmptyBg] = ImVec4(0.33f, 0.33f, 0.33f, 1.00f);
     colors[ImGuiCol_DockingPreview] = ImVec4(0.33f, 0.33f, 0.33f, 1.00f);
-
-#endif
-    colors[ImGuiCol_Separator] = colors[ImGuiCol_TitleBg];
-    colors[ImGuiCol_SeparatorActive] = colors[ImGuiCol_Separator];
-    colors[ImGuiCol_SeparatorHovered] = colors[ImGuiCol_Separator];
-    colors[ImGuiCol_Tab] = colors[ImGuiCol_MenuBarBg];
-    colors[ImGuiCol_TabUnfocused] = colors[ImGuiCol_MenuBarBg];
-    colors[ImGuiCol_TabUnfocusedActive] = colors[ImGuiCol_WindowBg];
-    colors[ImGuiCol_TabActive] = colors[ImGuiCol_WindowBg];
-    colors[ImGuiCol_ChildBg] = colors[ImGuiCol_TabActive];
-    colors[ImGuiCol_ScrollbarBg] = colors[ImGuiCol_TabActive];
-    colors[ImGuiCol_TitleBgActive] = colors[ImGuiCol_TitleBg];
-    colors[ImGuiCol_TitleBgCollapsed] = colors[ImGuiCol_TitleBg];
-    colors[ImGuiCol_MenuBarBg] = colors[ImGuiCol_TitleBg];
-    colors[ImGuiCol_PopupBg] = colors[ImGuiCol_WindowBg] + ImVec4(0.05f, 0.05f, 0.05f, 0.0f);
-    colors[ImGuiCol_Border] = ImVec4(0.08f, 0.10f, 0.12f, 0.00f);
-    colors[ImGuiCol_BorderShadow] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
 }
 
 void load_fonts()
@@ -249,7 +229,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-        blackboard::App_sdl_metal app("Example SDL+Metal", 1280, 720, true);
+        blackboard::App_sdl_metal app("Example SDL+Metal");
         app.on_update = update;
         app_path = app.get_app_path();
         std::cout << app_path << std::endl;
