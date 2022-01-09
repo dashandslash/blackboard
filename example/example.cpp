@@ -21,7 +21,7 @@ void set_dracula_theme()
     ImVec4 TabUnactive = ImVec4(0.137f, 0.168f, 0.23f, 1.0f);
 
     const auto IconColour = ImVec4(0.718, 0.62f, 0.86f, 1.00f);
-    colors[ImGuiCol_Text] = ImVec4(0.718, 0.62f, 0.64f, 1.00f);
+    colors[ImGuiCol_Text] = ImVec4(0.718, 0.72f, 0.74f, 1.00f);
     colors[ImGuiCol_TextDisabled] = ImVec4(0.36f, 0.42f, 0.47f, 1.00f);
 
     colors[ImGuiCol_WindowBg] = ImVec4{0.1f, 0.1f, 0.11f, 1.0f};
