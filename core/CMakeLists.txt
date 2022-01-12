@@ -17,7 +17,7 @@ set(HEADERS
     gui/gui.h
     renderer/platform/imgui_impl_sdl_bgfx.h
     renderer/camera.h
-    renderer/effect.h
+    renderer/material.h
     renderer/layouts.h
     renderer/program.h
     renderer/renderer.h
@@ -45,3 +45,5 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE "-D_CRT_SECURE_NO_WARNINGS" "
 if(WIN32)
     set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/ENTRY:\"mainCRTStartup\"" )
 endif()
+
+add_compile_definitions(IMGUI_DEFINE_MATH_OPERATORS)

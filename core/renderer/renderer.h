@@ -1,5 +1,5 @@
 #pragma once
-#include "effect.h"
+#include "material.h"
 
 #include <string>
 

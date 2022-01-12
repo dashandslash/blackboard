@@ -44,10 +44,7 @@ struct Material
 
     ~Material() {}
 
-    void init()
-    {
-        shader_prog.init(m_vert_path, m_frag_path);
-    }
+    void init() { shader_prog.init(m_vert_path, m_frag_path); }
 
     const bgfx::ProgramHandle program_handle() const { return shader_prog.program(); }
 
