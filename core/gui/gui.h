@@ -1,6 +1,8 @@
 #pragma once
 
-#include <memory>
+#include <bgfx/bgfx.h>
+#include <imgui/imgui.h>
+
 #include <string>
 
 namespace blackboard::gui {
@@ -17,4 +19,12 @@ struct Window
 };
 
 void init();
+
+void set_dracula_theme();
+
+// input format #aa11ff
+ImVec4 string_hex_to_rgb_float(const std::string &color);
+
+ImTextureID toId(bgfx::TextureHandle _handle, uint8_t _flags, uint8_t _mip);
+
 }    // namespace blackboard::gui
