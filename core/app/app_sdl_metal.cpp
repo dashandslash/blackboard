@@ -1,5 +1,7 @@
 #include "app.h"
 
+#include "resources.h"
+
 #include "renderer/platform/imgui_impl_sdl_bgfx.h"
 #include "renderer/renderer.h"
 
@@ -50,6 +52,11 @@ App_sdl_metal::App(const char *app_name, const uint16_t width, const uint16_t he
 template<>
 void App_sdl_metal::run()
 {
+    int drawable_width{0};
+    int drawable_height{0};
+    SDL_GL_GetDrawableSize(m_window.window, &drawable_width, &drawable_height);
+    on_resize(drawable_width, drawable_height);
+
     SDL_Event event;
     while (m_running)
     {
@@ -67,7 +74,12 @@ void App_sdl_metal::run()
                 const auto height = event.window.data2;
                 m_window.width = width;
                 m_window.height = height;
-                renderer::ImGui_Impl_sdl_bgfx_Resize(SDL_GetWindowFromID(event.window.windowID));
+                auto window = SDL_GetWindowFromID(event.window.windowID);
+                renderer::ImGui_Impl_sdl_bgfx_Resize(window);
+                int drawable_width{0};
+                int drawable_height{0};
+                SDL_GL_GetDrawableSize(window, &drawable_width, &drawable_height);
+                on_resize(drawable_width, drawable_height);
             }
         }
         renderer::ImGui_Impl_sdl_bgfx_NewFrame();
@@ -92,18 +104,14 @@ void App_sdl_metal::run()
 template<>
 std::filesystem::path App_sdl_metal::get_app_path()
 {
-    char *base_path = SDL_GetBasePath();
-    if (base_path)
-    {
-        return {SDL_GetBasePath()};
-    }
-
-    return {"./"};
+    return resources::path();
 }
 
 template<>
 App_sdl_metal::~App()
 {
+    renderer::material_manager().shutdown();
+
     ImGui_ImplSDL2_Shutdown();
     renderer::ImGui_Impl_sdl_bgfx_Shutdown();
 

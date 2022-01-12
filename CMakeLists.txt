@@ -3,8 +3,28 @@ set(PROJECT_NAME blackboard)
 
 project(${PROJECT_NAME})
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+include(FetchContent)
+
+FetchContent_Declare(
+    glm
+    GIT_REPOSITORY git@github.com:g-truc/glm.git
+    GIT_TAG master
+    GIT_SHALLOW 1
+)
+FetchContent_MakeAvailable(glm)
+
+FetchContent_Declare(
+    range-v3
+    GIT_REPOSITORY git@github.com:ericniebler/range-v3.git
+    GIT_TAG master
+    GIT_SHALLOW 1
+)
+FetchContent_Populate(range-v3)
+add_subdirectory(${range-v3_SOURCE_DIR} ${range-v3_BINARY_DIR})
+include_directories(${range-v3_SOURCE_DIR}/include)
 
 include_directories(external)
 include_directories(external/imgui)

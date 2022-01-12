@@ -158,7 +158,9 @@ void ImGui_Impl_sdl_bgfx_Resize(SDL_Window *window)
     SDL_GL_GetDrawableSize(window, &drawable_width, &drawable_height);
     ImGuiIO &io = ImGui::GetIO();
     io.DisplaySize = ImVec2((float)drawable_width, (float)drawable_height);
-    bgfx::reset(drawable_width, drawable_height, BGFX_RESET_VSYNC | BGFX_RESET_HIDPI);
+    bgfx::reset(drawable_width, drawable_height,
+                BGFX_RESET_VSYNC | BGFX_RESET_HIDPI | BGFX_RESET_FLUSH_AFTER_RENDER |
+                  BGFX_RESET_MSAA_X4);
 }
 
 void ImGui_Impl_sdl_bgfx_Render(const bgfx::ViewId view_id, ImDrawData *draw_data, uint32_t clearColor)

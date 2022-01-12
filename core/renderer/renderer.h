@@ -1,4 +1,5 @@
 #pragma once
+#include "effect.h"
 
 #include <string>
 
@@ -15,5 +16,11 @@ enum class Api : uint8_t
 };
 
 bool init(SDL_Window *window, const uint16_t width, const uint16_t height);
+
+inline renderer::material::Manager &material_manager()
+{
+    static renderer::material::Manager mm;
+    return mm;
+}
 }    // namespace renderer
 }    // namespace blackboard

@@ -5,15 +5,24 @@ set(SOURCES
     app/app_headless.cpp
     app/app_sdl_metal.cpp
     gui/gui.cpp
+    renderer/camera.cpp
     renderer/platform/imgui_impl_sdl_bgfx.cpp
+    renderer/program.cpp
     renderer/renderer.cpp
     )
 
 set(HEADERS 
     app/app.h
+    app/resources.h
     gui/gui.h
     renderer/platform/imgui_impl_sdl_bgfx.h
+    renderer/camera.h
+    renderer/effect.h
+    renderer/layouts.h
+    renderer/program.h
     renderer/renderer.h
+    renderer/utils.h
+    utils/watchdog.h
     )
 
 add_library(${PROJECT_NAME} STATIC ${HEADERS} ${SOURCES})
@@ -22,6 +31,8 @@ target_link_libraries(${PROJECT_NAME}
                       PRIVATE
                       bgfx
                       ImGui
+                      glm
+                      range-v3::range-v3
                       SDL2-static
                       )
 
@@ -34,4 +45,3 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE "-D_CRT_SECURE_NO_WARNINGS" "
 if(WIN32)
     set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/ENTRY:\"mainCRTStartup\"" )
 endif()
-
