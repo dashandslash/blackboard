@@ -118,16 +118,14 @@ struct Manager
     }
 
     template<typename T>
-    inline auto material() const
+    inline decltype(auto) material() const
     {
-        if (auto element = materials.find(typeid(T).hash_code()); element != materials.end())
-        {
-            return std::visit(
-              overloaded{
-                [&](const MaterialType &mat) { return std::get<std::shared_ptr<T>>(mat); },
-              },
-              element->second);
-        }
+        assert(materials.contains(typeid(T).hash_code()));
+        return std::visit(
+          overloaded{
+            [&](const MaterialType &mat) { return std::get<std::shared_ptr<T>>(mat); },
+          },
+          materials.at(typeid(T).hash_code()));
     }
 
     void set_uniform(bgfx::Encoder *encoder, Uniform *uniform)

@@ -15,10 +15,19 @@ namespace blackboard {
 
 void create_window(gui::Window<SDL_Window> &window)
 {
+    //    window.window = SDL_CreateWindow(window.title.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, window.width, window.height, SDL_WINDOW_SHOWN);
+    //
+    //    if (window.window == nullptr) {
+    //        printf("Window could not be created. SDL_Error: %s\n", SDL_GetError());
+    //        return;
+    //    }
+    //    return;
+
     window.window = SDL_CreateWindow(
       window.title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, window.width, window.height,
       (window.fullscreen ? (SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_BORDERLESS) : SDL_WINDOW_SHOWN) |
         SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+    //    SDL_SetWindowBordered(window.window, SDL_FALSE);
 }
 
 template<>
@@ -40,21 +49,25 @@ App_sdl_metal::App(const char *app_name, const uint16_t width, const uint16_t he
 
     gui::init();
 
-    ImGui_ImplSDL2_InitForMetal(m_window.window);
 
     if (m_window.window)
     {
         renderer::init(m_window.window, m_window.width, m_window.height);
         renderer::ImGui_Impl_sdl_bgfx_Init(m_window.imgui_view_id);
     }
+
+    ImGui_ImplSDL2_InitForMetal(m_window.window);
 }
 
 template<>
 void App_sdl_metal::run()
 {
+    on_init();
+    ImGui::LoadIniSettingsFromDisk((resources::path() / "imgui.ini").string().c_str());
     int drawable_width{0};
     int drawable_height{0};
-    SDL_GL_GetDrawableSize(m_window.window, &drawable_width, &drawable_height);
+    SDL_Metal_GetDrawableSize(m_window.window, &drawable_width, &drawable_height);
+    SDL_GetWindowPosition(m_window.window, &m_window.window_x, &m_window.window_y);
     on_resize(drawable_width, drawable_height);
 
     SDL_Event event;
@@ -63,6 +76,7 @@ void App_sdl_metal::run()
         while (m_window.window != nullptr && SDL_PollEvent(&event))
         {
             ImGui_ImplSDL2_ProcessEvent(&event);
+
             if (event.type == SDL_QUIT)
                 m_running = false;
             if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE &&
@@ -78,15 +92,44 @@ void App_sdl_metal::run()
                 renderer::ImGui_Impl_sdl_bgfx_Resize(window);
                 int drawable_width{0};
                 int drawable_height{0};
-                SDL_GL_GetDrawableSize(window, &drawable_width, &drawable_height);
+                SDL_Metal_GetDrawableSize(window, &drawable_width, &drawable_height);
                 on_resize(drawable_width, drawable_height);
             }
+#if 0
+            if (event.type == SDL_MOUSEMOTION) {
+                m_window.prev_mouse_x = m_window.mouse_x;
+                m_window.prev_mouse_y = m_window.mouse_y;
+                SDL_GetGlobalMouseState( &m_window.mouse_x, &m_window.mouse_y );
+
+                if (m_window.is_dragging) {
+                    m_window.window_x += m_window.mouse_x - m_window.prev_mouse_x;
+                    m_window.window_y += m_window.mouse_y - m_window.prev_mouse_y;
+                    
+                    SDL_SetWindowPosition(m_window.window, m_window.window_x, m_window.window_y);
+                }
+            }
+            if (event.type == SDL_MOUSEBUTTONDOWN)
+            {
+                m_window.prev_mouse_x = m_window.mouse_x;
+                m_window.prev_mouse_y = m_window.mouse_y;
+                SDL_GetGlobalMouseState( &m_window.mouse_x, &m_window.mouse_y );
+                m_window.is_dragging = true;
+            }
+            if (event.type == SDL_MOUSEBUTTONUP)
+            {
+                m_window.prev_mouse_x = m_window.mouse_x;
+                m_window.prev_mouse_y = m_window.mouse_y;
+                SDL_GetGlobalMouseState( &m_window.mouse_x, &m_window.mouse_y );
+                m_window.is_dragging = false;
+            }
+#endif
         }
         renderer::ImGui_Impl_sdl_bgfx_NewFrame();
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
 
         on_update();
+        m_prev_time = std::chrono::steady_clock::now();
 
         ImGui::Render();
         renderer::ImGui_Impl_sdl_bgfx_Render(m_window.imgui_view_id, ImGui::GetDrawData(), 0x000000FF);
@@ -102,7 +145,7 @@ void App_sdl_metal::run()
 }
 
 template<>
-std::filesystem::path App_sdl_metal::get_app_path()
+std::filesystem::path App_sdl_metal::resources_path()
 {
     return resources::path();
 }
@@ -110,6 +153,8 @@ std::filesystem::path App_sdl_metal::get_app_path()
 template<>
 App_sdl_metal::~App()
 {
+    ImGui::SaveIniSettingsToDisk((resources::path() / "imgui.ini").string().c_str());
+
     renderer::material_manager().shutdown();
 
     ImGui_ImplSDL2_Shutdown();

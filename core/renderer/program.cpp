@@ -15,6 +15,9 @@ constexpr auto ShaderBinExtension = ".bin";
 #ifdef __APPLE__
 constexpr auto ShaderPlatformFlags = " --platform osx -p metal";
 constexpr auto ShadercBinary = "tools/osx/shaderc";
+#elif __EMSCRIPTEN__
+constexpr auto ShaderPlatformFlags = " --platform osx -p metal";
+constexpr auto ShadercBinary = "tools/osx/shaderc";
 #elif _WIN32
 constexpr auto ShaderPlatformFlags = " --platform windows -p s_5_0";
 constexpr auto ShadercBinary = "tools/win/shaderc.exe";

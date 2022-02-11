@@ -7,12 +7,12 @@ namespace blackboard::resources {
 
 inline std::filesystem::path path()
 {
-    char *base_path = SDL_GetBasePath();
-    if (base_path)
+#ifndef __EMSCRIPTEN__
+    if (char *base_path = SDL_GetBasePath(); base_path)
     {
-        return {SDL_GetBasePath()};
+        return {base_path};
     }
-
-    return {"./"};
+#endif
+    return strdup("/");
 }
 }    // namespace blackboard::resources

@@ -12,7 +12,8 @@ enum class Api : uint8_t
 {
     none = 0,
     metal,
-    d3d11
+    d3d11,
+    WebGL
 };
 
 bool init(SDL_Window *window, const uint16_t width, const uint16_t height);

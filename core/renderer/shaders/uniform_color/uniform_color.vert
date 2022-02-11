@@ -13,5 +13,5 @@ void main()
 	v_bc = a_color1;
 
 	vec3 normal = a_normal.xyz*2.0 - 1.0;
-    v_normal = normal; //mul(u_model[0], vec4(normal, 0.0) ).xyz;
+	v_normal = mul(u_model[0], vec4(normal, 0.0) ).xyz;
 }

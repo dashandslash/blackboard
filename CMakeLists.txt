@@ -9,6 +9,14 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 include(FetchContent)
 
 FetchContent_Declare(
+    EnTT
+    GIT_REPOSITORY https://github.com/skypjack/entt.git
+    GIT_TAG master
+    GIT_SHALLOW 1
+)
+FetchContent_MakeAvailable(EnTT)
+
+FetchContent_Declare(
     glm
     GIT_REPOSITORY git@github.com:g-truc/glm.git
     GIT_TAG master
@@ -25,6 +33,10 @@ FetchContent_Declare(
 FetchContent_Populate(range-v3)
 add_subdirectory(${range-v3_SOURCE_DIR} ${range-v3_BINARY_DIR})
 include_directories(${range-v3_SOURCE_DIR}/include)
+
+if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
+  set(CMAKE_COMMAND emcmake cmake)
+endif ()
 
 include_directories(external)
 include_directories(external/imgui)
