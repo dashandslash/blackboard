@@ -15,7 +15,6 @@ namespace renderer {
 
 bool init(SDL_Window *window, const Api renderer_api, const uint16_t width, const uint16_t height)
 {
-#ifdef __APPLE__
     SDL_SysWMinfo wmi;
     SDL_VERSION(&wmi.version);
     if (!SDL_GetWindowWMInfo(window, &wmi))
@@ -24,12 +23,9 @@ bool init(SDL_Window *window, const Api renderer_api, const uint16_t width, cons
         return false;
     }
 
-    bgfx::renderFrame();    // single threaded mode
-#endif
-
     bgfx::PlatformData pd{};
     bgfx::Init bgfx_init;
-
+    bgfx::renderFrame();    // single threaded mode
     switch (renderer_api)
     {
         case Api::metal:
@@ -53,7 +49,7 @@ bool init(SDL_Window *window, const Api renderer_api, const uint16_t width, cons
     pd.nwh = renderer::native_window_handle(window);
     bgfx_init.resolution.numBackBuffers = 1;
 
-    bgfx_init.resolution.reset = BGFX_RESET_VSYNC | BGFX_RESET_HIDPI;
+    bgfx_init.resolution.reset = BGFX_RESET_VSYNC | BGFX_RESET_HIDPI | BGFX_RESET_MSAA_X4;
     bgfx_init.platformData = pd;
     bgfx::init(bgfx_init);
 

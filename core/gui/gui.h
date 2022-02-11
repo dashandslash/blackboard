@@ -31,6 +31,8 @@ void init();
 
 void set_dracula_theme();
 
+void dockspace();
+
 // input format #aa11ff
 ImVec4 string_hex_to_rgb_float(const std::string &color);
 
