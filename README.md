@@ -1,17 +1,16 @@
 # [WIP] blackboard
 imgui multiviewport + bgfx 
 
-Tested only on macos so far with metal backend
+Support for:
+ - MacOs Metal
+ - Windows d3d11
+ - WebAssemply (WIP)
 
 ## build
 ```
 mkdir .build && cd .build
 cmake .. -G Xcode
-open blackboard.xcodeproj/
+cmake --build . --target blackboard_example -j
 ```
-
-Build from xcode.
-
-And of course you can build with whatever you like :)
 
 ![Alt Text](https://github.com/dashandslash/blackboard/blob/main/example/example.gif)
