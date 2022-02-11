@@ -2,13 +2,13 @@ cmake_minimum_required(VERSION 3.21)
 project(core)
 
 set(SOURCES
-    app/app_headless.cpp
-    app/app_sdl_metal.cpp
+    app/app.cpp
     gui/gui.cpp
     renderer/camera.cpp
     renderer/platform/imgui_impl_sdl_bgfx.cpp
     renderer/program.cpp
     renderer/renderer.cpp
+    state/state.cpp
     )
 
 set(HEADERS 
@@ -22,6 +22,9 @@ set(HEADERS
     renderer/program.h
     renderer/renderer.h
     renderer/utils.h
+    scene/components/animation.h
+    scene/components/transform.h
+    state/state.h
     utils/watchdog.h
     )
 
@@ -30,6 +33,7 @@ add_library(${PROJECT_NAME} STATIC ${HEADERS} ${SOURCES})
 target_link_libraries(${PROJECT_NAME}
                       PRIVATE
                       bgfx
+                      EnTT
                       ImGui
                       glm
                       range-v3::range-v3

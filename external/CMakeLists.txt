@@ -2,8 +2,12 @@ cmake_minimum_required(VERSION 3.21)
 project(third-party)
 
 # <bgfx
-set( BGFX_BUILD_TOOLS  ON  CACHE INTERNAL "" )
-set( BGFX_BUILD_EXAMPLES  ON CACHE INTERNAL "" )
+if(EMSCRIPTEN OR IOS)
+    set(BGFX_BUILD_TOOLS OFF CACHE INTERNAL "")
+else()
+    set(BGFX_BUILD_TOOLS ON CACHE INTERNAL "")
+endif()
+set( BGFX_BUILD_EXAMPLES  OFF CACHE INTERNAL "" )
 set( BGFX_CUSTOM_TARGETS  OFF CACHE INTERNAL "" )
 add_subdirectory( bgfx.cmake )
 # bgfx>

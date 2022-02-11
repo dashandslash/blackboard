@@ -155,7 +155,7 @@ void ImGui_Impl_sdl_bgfx_Resize(SDL_Window *window)
 {
     int drawable_width{0};
     int drawable_height{0};
-    SDL_GL_GetDrawableSize(window, &drawable_width, &drawable_height);
+    SDL_Metal_GetDrawableSize(window, &drawable_width, &drawable_height);
     ImGuiIO &io = ImGui::GetIO();
     io.DisplaySize = ImVec2((float)drawable_width, (float)drawable_height);
     bgfx::reset(drawable_width, drawable_height,
@@ -196,7 +196,7 @@ void ImGui_Impl_sdl_bgfx_Render(const bgfx::ViewId view_id, ImDrawData *draw_dat
                           (uint16_t)draw_data->DisplaySize.y * clipScale.y);
     }
 
-    //    draw_data->ScaleClipRects(clipScale);
+    // draw_data->ScaleClipRects(clipScale);
     // Render command lists
     for (int32_t ii = 0, num = draw_data->CmdListsCount; ii < num; ++ii)
     {
@@ -365,5 +365,6 @@ void ImGui_Impl_sdl_bgfx_NewFrame()
         ImGui_Implbgfx_CreateDeviceObjects();
     }
 }
+
 }    // namespace renderer
 }    // namespace blackboard

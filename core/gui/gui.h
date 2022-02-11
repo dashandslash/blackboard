@@ -16,6 +16,15 @@ struct Window
     uint16_t imgui_view_id{255};    // might be possible to remove this id
     bool fullscreen{false};
     WindowType *window;
+    bool is_dragging{false};
+
+    int prev_mouse_x;
+    int prev_mouse_y;
+    int mouse_x;
+    int mouse_y;
+
+    int window_x;
+    int window_y;
 };
 
 void init();
