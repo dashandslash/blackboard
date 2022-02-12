@@ -38,7 +38,7 @@ public:
         return std::chrono::duration<float>(std::chrono::steady_clock::now() - m_start_time).count();
     }
 
-    // protected:
+protected:
     Window<WindowType> m_window;
     bool m_running{true};
     uint32_t m_update_rate{16};

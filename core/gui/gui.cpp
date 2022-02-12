@@ -135,6 +135,25 @@ void set_dracula_theme()
     colors[ImGuiCol_DockingPreview] = dark_alpha_purple;
 }
 
+void load_font(const std::filesystem::path &path, const float size, const bool set_as_default)
+{
+    ImFontConfig font_config;
+    font_config.RasterizerMultiply = 1.5f;
+    font_config.OversampleH = 4;
+    font_config.OversampleV = 4;
+    auto &io = ImGui::GetIO();
+    if (path.extension() != ".ttf" && path.extension() != ".otf")
+    {
+        return;
+    }
+    io.Fonts->AddFontFromFileTTF(path.c_str(), size, &font_config);
+    // setup default font
+    if (set_as_default)
+    {
+        io.FontDefault = io.Fonts->Fonts.back();
+    }
+}
+
 void dockspace()
 {
     static bool opt_fullscreen{true};

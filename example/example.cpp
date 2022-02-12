@@ -27,35 +27,7 @@ bgfx::FrameBufferHandle frameBufferHandle = BGFX_INVALID_HANDLE;
 renderer::material::Uniform uniform = {.u_color = {1.0, 1.0, 1.0, 1.0},
                                        .u_edge_thickness = 3.5f,
                                        .u_edge_color{0.0f, 0.0f, 0.0f, 1.0f}};
-
 State state;
-
-void load_fonts()
-{
-    ImFontConfig font_config;
-    font_config.RasterizerMultiply = 1.5f;
-    font_config.OversampleH = 4;
-    font_config.OversampleV = 4;
-    auto &io = ImGui::GetIO();
-
-    const auto fonts_directory = resources::path() / "assets/fonts/";
-
-    //    std::cout << "fonts_directory: " << fonts_directory.string() << std::endl;
-
-    for (const auto &font_file : std::filesystem::recursive_directory_iterator{fonts_directory})
-    {
-        //        std::cout << "font_file: " << font_file.path().string() << std::endl;
-        if (font_file.path().extension() == ".ttf" || font_file.path().extension() == ".otf")
-        {
-            io.Fonts->AddFontFromFileTTF(font_file.path().c_str(), 15, &font_config);
-        }
-        // setup default font
-        if (font_file.path().stem() == "SourceSansPro-Regular")
-        {
-            io.FontDefault = io.Fonts->Fonts.back();
-        }
-    }
-}
 
 void init()
 {
@@ -72,7 +44,12 @@ void init()
     const auto imgui_ini_path = (resources::path() / "imgui.ini").string();
 
     gui::set_dracula_theme();
-    load_fonts();
+    const auto fonts_path = resources::path() / "assets/fonts";
+    gui::load_font(fonts_path / "Source_Sans_Pro/SourceSansPro-Regular.ttf", 15.0f, true);
+    gui::load_font(fonts_path / "Roboto/Roboto-Regular.ttf", 14.0f);
+    gui::load_font(fonts_path / "Dejavu-sans/DejaVuSans.ttf", 14.0f);
+    gui::load_font(fonts_path / "Dejavu-sans/DejaVuSansCondensed.ttf", 14.0f);
+    gui::load_font(fonts_path / "IBM_Plex_Sans/IBMPlexSans-Regular.ttf", 14.0f);
 
     ImGui::LoadIniSettingsFromDisk(imgui_ini_path.c_str());
 

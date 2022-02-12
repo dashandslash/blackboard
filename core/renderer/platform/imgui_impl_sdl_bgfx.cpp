@@ -114,7 +114,6 @@ static void ImguiBgfxOnCreateWindow(ImGuiViewport *viewport)
     data->width = bx::max<uint16_t>((uint16_t)viewport->Size.x, 1);
     data->height = bx::max<uint16_t>((uint16_t)viewport->Size.y, 1);
     // Create frame buffer
-
     data->frameBufferHandle =
       bgfx::createFrameBuffer(native_window_handle((SDL_Window *)viewport->PlatformHandle),
                               data->width * viewport->DrawData->FramebufferScale.x,
