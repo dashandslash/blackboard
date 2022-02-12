@@ -4,6 +4,7 @@ project(core)
 set(SOURCES
     app/app.cpp
     gui/gui.cpp
+    platform/window.cpp
     renderer/camera.cpp
     renderer/platform/imgui_impl_sdl_bgfx.cpp
     renderer/program.cpp
@@ -15,6 +16,7 @@ set(HEADERS
     app/app.h
     app/resources.h
     gui/gui.h
+    platform/window.h
     renderer/platform/imgui_impl_sdl_bgfx.h
     renderer/camera.h
     renderer/material.h

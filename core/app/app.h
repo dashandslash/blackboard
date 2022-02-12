@@ -1,6 +1,7 @@
 #pragma once
 
 #include "gui/gui.h"
+#include "platform/window.h"
 #include "renderer/renderer.h"
 
 #include <filesystem>
@@ -38,7 +39,7 @@ public:
     }
 
     // protected:
-    gui::Window<WindowType> m_window;
+    Window<WindowType> m_window;
     bool m_running{true};
     uint32_t m_update_rate{16};
     renderer::Api m_renderer_api{renderer::Api::none};

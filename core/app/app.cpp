@@ -13,15 +13,6 @@
 
 namespace blackboard {
 
-void create_window(gui::Window<SDL_Window> &window)
-{
-    window.window = SDL_CreateWindow(
-      window.title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, window.width, window.height,
-      (window.fullscreen ? (SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_BORDERLESS) : SDL_WINDOW_SHOWN) |
-        SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-    //    SDL_SetWindowBordered(window.window, SDL_FALSE);
-}
-
 App::App(const char *app_name, const renderer::Api renderer_api, const uint16_t width,
          const uint16_t height, const bool fullscreen)
 {
@@ -36,7 +27,7 @@ App::App(const char *app_name, const renderer::Api renderer_api, const uint16_t 
     m_window.fullscreen = fullscreen;
 
     SDL_SetHint(SDL_HINT_RENDER_DRIVER, "metal");
-    create_window(m_window);
+    m_window.init_platform_window();
 
     gui::init();
 
