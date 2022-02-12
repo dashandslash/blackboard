@@ -9,6 +9,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <numbers>
 
 float lerp(const float &a, const float &b, const float &f)
 {
@@ -319,7 +320,7 @@ void CameraPersp::setPerspective(float verticalFovDegrees, float aspectRatio, fl
 
 void CameraPersp::calcProjection() const
 {
-    mFrustumTop = mNearClip * tan(static_cast<float>(M_PI) / 180.0f * mFov * 0.5f);
+    mFrustumTop = mNearClip * tan(static_cast<float>(std::numbers::pi) / 180.0f * mFov * 0.5f);
     mFrustumBottom = -mFrustumTop;
     mFrustumRight = mFrustumTop * mAspectRatio;
     mFrustumLeft = -mFrustumRight;

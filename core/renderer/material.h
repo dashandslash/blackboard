@@ -91,8 +91,8 @@ struct Manager
                   const auto callback = [&m](const std::filesystem::path &path) { m->init(); };
                   utils::wd::watch(vert_shader, callback);
                   utils::wd::watch(frag_shader, callback);
-                  utils::wd::watch(vert_shader, callback_multi);
-                  utils::wd::watch(frag_shader, callback_multi);
+                  utils::wd::watchMany(vert_shader, callback_multi);
+                  utils::wd::watchMany(frag_shader, callback_multi);
               },
               material);
         }

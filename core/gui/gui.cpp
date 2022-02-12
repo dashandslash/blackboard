@@ -146,7 +146,7 @@ void load_font(const std::filesystem::path &path, const float size, const bool s
     {
         return;
     }
-    io.Fonts->AddFontFromFileTTF(path.c_str(), size, &font_config);
+    io.Fonts->AddFontFromFileTTF(path.string().c_str(), size, &font_config);
     // setup default font
     if (set_as_default)
     {

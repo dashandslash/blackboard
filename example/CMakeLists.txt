@@ -38,7 +38,7 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
     target_link_libraries(${PROJECT_NAME} range-v3::range-v3)
 elseif(WIN32)
     add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
-    set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/ENTRY:\"mainCRTStartup\"" )
+#    set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/ENTRY:\"mainCRTStartup\"" )
 elseif(APPLE)
     add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${SOURCES} ${HEADERS})
     set_target_properties(${PROJECT_NAME} PROPERTIES
@@ -61,25 +61,62 @@ elseif(APPLE)
 endif()
 
 if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
+    target_link_libraries(${PROJECT_NAME}
+                    PRIVATE
+                    core
+                    bgfx
+                    EnTT
+                    glm
+                    range-v3::range-v3
+                    SDL2-static
+                    )
+
     target_compile_definitions(${PROJECT_NAME} PRIVATE "-D_CRT_SECURE_NO_WARNINGS" "-D__STDC_FORMAT_MACROS")
     add_dependencies(${PROJECT_NAME} copy_assets)
+    if(APPLE)
+        add_custom_target(copy_assets
+            COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_CURRENT_LIST_DIR}/assets"
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../Resources/assets"
+        )
+    else()
+        add_custom_target(copy_assets
+            COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${CMAKE_CURRENT_LIST_DIR}/assets
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>/Resources/assets"
+        )
+    endif()
 
-    add_custom_target(copy_assets
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${CMAKE_CURRENT_LIST_DIR}/assets
-        $<TARGET_FILE_DIR:${PROJECT_NAME}>/../Resources/assets
-    )
+        message(STATUS  "$<TARGET_FILE:shaderc>" $<TARGET_FILE:shaderc>)
 
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-        # Copy shaders
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_CURRENT_SOURCE_DIR}/../core/renderer/shaders"
-        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../Resources/shaders"
+    if(APPLE)
+        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            # Copy shaders
+            COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_CURRENT_SOURCE_DIR}/../core/renderer/shaders"
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../Resources/shaders"
 
-        COMMAND ${CMAKE_COMMAND} -E copy
-        "$<TARGET_FILE:shaderc>"
-        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../Resources/tools/osx/shaderc"
-    )
+            COMMAND ${CMAKE_COMMAND} -E copy
+
+            "$<TARGET_FILE:shaderc>"
+
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../Resources/tools/osx/shaderc"
+        )
+    else()
+        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            # Copy shaders
+            COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_CURRENT_SOURCE_DIR}/../core/renderer/shaders"
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>/Resources/shaders"
+
+            COMMAND ${CMAKE_COMMAND} -E copy
+
+            "$<TARGET_FILE:shaderc>"
+
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>/Resources/tools/win/shaderc.exe"
+        )
+    endif()
+
 else()
 # copy the assets
 endif()

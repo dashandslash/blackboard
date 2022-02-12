@@ -6,6 +6,10 @@ project(${PROJECT_NAME})
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+if(MSVC)
+ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+endif()
+
 include(FetchContent)
 
 FetchContent_Declare(
@@ -37,7 +41,9 @@ include_directories(${range-v3_SOURCE_DIR}/include)
 include_directories(external)
 include_directories(external/imgui)
 include_directories(external/bgfx.cmake/bx/include)
+include_directories(external/bgfx.cmake/bgfx/include)
 include_directories(${PROJECT_SOURCE_DIR})
+include_directories(core)
 
 add_subdirectory(example)
 add_subdirectory(core)

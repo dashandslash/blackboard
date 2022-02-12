@@ -10,14 +10,18 @@
 
 namespace {
 
-constexpr auto ShaderBinExtension = ".bin";
+constexpr auto shader_bin_extension = ".bin";
 
 #ifdef __APPLE__
-constexpr auto ShaderPlatformFlags = " --platform osx -p metal";
-constexpr auto ShadercBinary = "tools/osx/shaderc";
+constexpr auto shader_platform_flags = " --platform osx";
+constexpr auto shader_fragment_program_flags = " -p metal";
+constexpr auto shader_vertex_program_flags = " -p metal";
+constexpr auto shaderc_binary = "tools/osx/shaderc";
 #elif _WIN32
-constexpr auto ShaderPlatformFlags = " --platform windows -p s_5_0";
-constexpr auto ShadercBinary = "tools/win/shaderc.exe";
+constexpr auto shader_platform_flags = " --platform windows";
+constexpr auto shader_fragment_program_flags = " -p ps_5_0";
+constexpr auto shader_vertex_program_flags = " -p vs_5_0";
+constexpr auto shaderc_binary = "tools/win/shaderc.exe";
 #endif
 
 bgfx::ShaderHandle loadShader(const std::filesystem::path &filePath)
@@ -42,13 +46,24 @@ bgfx::ShaderHandle loadShader(const std::filesystem::path &filePath)
 
 int compileShader(const std::filesystem::path &shaderFile, blackboard::renderer::Program::Type type)
 {
-    std::string cmd = blackboard::resources::path().append(ShadercBinary).string();    // shaderc binary
+    std::string cmd = blackboard::resources::path().append(shaderc_binary).string();    // shaderc binary
     cmd.append(" -f " + shaderFile.string());    // input file
-    cmd.append(" -o " + shaderFile.string() + ShaderBinExtension);    // output file
+    cmd.append(" -o " + shaderFile.string() + shader_bin_extension);    // output file
     cmd.append(" -i " +
                blackboard::resources::path().append("shaders/common").string());    // include path
     cmd.append(blackboard::renderer::Program::TypeFlag[type]);    // shader type
-    cmd.append(ShaderPlatformFlags);    // platform flags
+    cmd.append(shader_platform_flags);    // platform flags
+    switch (type)
+    {
+    case blackboard::renderer::Program::VERTEX:
+        cmd.append(shader_vertex_program_flags);    // platform flags
+        break;
+    case blackboard::renderer::Program::FRAGMENT:
+        cmd.append(shader_fragment_program_flags);    // platform flags
+        break;
+    default:
+        break;
+    }
     return system(cmd.c_str());
 }
 
@@ -66,8 +81,8 @@ bool Program::init(const std::filesystem::path &vshPath, const std::filesystem::
     {
         return false;
     }
-    const auto vsh = loadShader(vshPath.string() + ShaderBinExtension);
-    const auto fsh = loadShader(fshPath.string() + ShaderBinExtension);
+    const auto vsh = loadShader(vshPath.string() + shader_bin_extension);
+    const auto fsh = loadShader(fshPath.string() + shader_bin_extension);
     if (!bgfx::isValid(vsh) && !bgfx::isValid(fsh))
     {
         return false;

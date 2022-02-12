@@ -10,11 +10,11 @@ $input v_view, v_pos, v_bc, v_normal
 
 vec3 evalSh(vec3 _dir)
 {
-#    define k01 0.2820947918 // sqrt( 1/PI)/2
-#    define k02 0.4886025119 // sqrt( 3/PI)/2
-#    define k03 1.0925484306 // sqrt(15/PI)/2
-#    define k04 0.3153915652 // sqrt( 5/PI)/4
-#    define k05 0.5462742153 // sqrt(15/PI)/4
+#define k01 0.2820947918 // sqrt( 1/PI)/2
+#define k02 0.4886025119 // sqrt( 3/PI)/2
+#define k03 1.0925484306 // sqrt(15/PI)/2
+#define k04 0.3153915652 // sqrt( 5/PI)/4
+#define k05 0.5462742153 // sqrt(15/PI)/4
 
     vec3 shEnv[9];
     shEnv[0] = vec3( 0.967757057878229854,  0.976516067990363390,  0.891218272348969998); /* Band 0 */
@@ -61,7 +61,7 @@ void main()
 
 //    if (0.0 != u_drawEdges)
 //    {
-        vec3  wfColor   = vec3(1.0);
+        vec3  wfColor   = vec3_splat(1.0);
         float wfOpacity = 1.0;
 
         vec3 fw = (abs(dFdx(v_bc)) + abs(dFdy(v_bc)));
@@ -69,7 +69,7 @@ void main()
         float edge = min(min(val.x, val.y), val.z); // Gets to 0.0 when close to edges.
 
         vec3 edgeCol = mix(col, wfColor, wfOpacity);
-        col = mix(edgeCol, vec3(0.0), edge);
+        col = mix(edgeCol, vec3_splat(0.0), edge);
 //    }
 
     gl_FragColor = lerp(u_color, u_edge_color, step(edge, 0.9));

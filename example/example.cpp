@@ -1,3 +1,5 @@
+#define SDL_MAIN_HANDLED
+
 #include <core/app/app.h>
 #include <core/renderer/camera.h>
 #include <core/renderer/layouts.h>
@@ -25,8 +27,9 @@ bgfx::IndexBufferHandle ibh;
 renderer::CameraPersp cam;
 bgfx::FrameBufferHandle frameBufferHandle = BGFX_INVALID_HANDLE;
 renderer::material::Uniform uniform = {.u_color = {1.0, 1.0, 1.0, 1.0},
-                                       .u_edge_thickness = 3.5f,
-                                       .u_edge_color{0.0f, 0.0f, 0.0f, 1.0f}};
+                                       .u_edge_color{0.0f, 0.0f, 0.0f, 1.0f},
+                                       .u_edge_thickness = 3.5f
+                                       };
 State state;
 
 void init()

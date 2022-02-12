@@ -33,23 +33,29 @@ set(HEADERS
 add_library(${PROJECT_NAME} STATIC ${HEADERS} ${SOURCES})
 
 target_link_libraries(${PROJECT_NAME}
-                      PRIVATE
+                      PUBLIC
+                      SDL2-static
                       bgfx
                       EnTT
                       ImGui
                       glm
                       range-v3::range-v3
-                      SDL2-static
                       )
+target_include_directories(${PROJECT_NAME}
+                           PUBLIC
+                           ${PROJECT_SOURCE_DIR}
+                           ${SDL2_INCLUDE_DIRS}
+                           ${SDL2_IMAGE_INCLUDE_DIRS}
+                           ${SDL2_TTF_INCLUDE_DIRS}
+                           ${SDL2_MIXER_INCLUDE_DIRS}
+                           ${PROJECT_SOURCE_DIR}/../external/bgfx.cmake/bx/include/compat/msvc
+)
 
-target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR})
+target_compile_definitions(${PROJECT_NAME} PRIVATE "-D_CRT_SECURE_NO_WARNINGS" "-D__STDC_FORMAT_MACROS" )
+# target_compile_definitions(${PROJECT_NAME} PRIVATE "-D_CRT_SECURE_NO_WARNINGS" "-D__STDC_FORMAT_MACROS") 
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE "-D_CRT_SECURE_NO_WARNINGS" "-D__STDC_FORMAT_MACROS" "-DENTRY_CONFIG_IMPLEMENT_MAIN=1" )
-# target_compile_definitions(${PROJECT_NAME} PRIVATE "-D_CRT_SECURE_NO_WARNINGS" "-D__STDC_FORMAT_MACROS")
-
-
-if(WIN32)
-    set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/ENTRY:\"mainCRTStartup\"" )
-endif()
+#if(WIN32)
+#    set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/ENTRY:\"mainCRTStartup\"" )
+#endif()
 
 add_compile_definitions(IMGUI_DEFINE_MATH_OPERATORS)

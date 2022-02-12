@@ -25,6 +25,8 @@
 #pragma once
 
 #include <atomic>
+#include <filesystem>
+#include <functional>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -32,28 +34,9 @@
 #include <thread>
 #include <vector>
 
-#ifdef CINDER_CINDER
-#include "cinder/Filesystem.h"
-#if CINDER_VERSION < 900
-#include "cinder/app/AppNative.h"
-#else
-#include "cinder/app/App.h"
-#endif
-#else
-#if defined(CINDER_WINRT) || (defined(_MSC_VER) && (_MSC_VER >= 1900))
-#include <filesystem>
-namespace ci {
-namespace fs = std::tr2::sys;
-}
-#else
-#define BOOST_FILESYSTEM_VERSION 3
-#define BOOST_FILESYSTEM_NO_DEPRECATED
-#include <filesystem>
 namespace ci {
 namespace fs = std::filesystem;
 }
-#endif
-#endif
 
 // Windows Issue :
 // For the moment the overloaded version of wd::watch has a different name on windows
@@ -106,13 +89,8 @@ public:
     }
 
     //! Watches a file or directory for modification and call back the specified std::function. A list of modified files or directory is passed as argument of the callback. Use this version only if you are watching multiple files or a directory.
-#ifdef WIN_AMBIGUITY_FIX
     static void watchMany(const ci::fs::path &path,
                           const std::function<void(const std::vector<ci::fs::path> &)> &callback)
-#else
-    static void watch(const ci::fs::path &path,
-                      const std::function<void(const std::vector<ci::fs::path> &)> &callback)
-#endif
     {
         watchImpl(path, std::function<void(const ci::fs::path &)>(), callback);
     }
@@ -479,7 +457,7 @@ public:
                       const std::function<void(const ci::fs::path &)> &callback)
     {
         auto pathFilter =
-          Watchdog::visitWildCardPath(path, [](const ci::fs::path &p) { return false; });
+          Watchdog::visitWildCardPath(path, [](const ci::fs::path &p) -> bool { return false; });
         if (pathFilter.first.empty())
         {
             throw WatchedFileSystemExc(path);
@@ -498,7 +476,7 @@ public:
 #endif
     {
         auto pathFilter =
-          Watchdog::visitWildCardPath(path, [](const ci::fs::path &p) { return false; });
+          Watchdog::visitWildCardPath(path, [](const ci::fs::path &p) -> bool { return false; });
         if (pathFilter.first.empty())
         {
             throw WatchedFileSystemExc(path);
