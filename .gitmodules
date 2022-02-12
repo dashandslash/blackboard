@@ -1,12 +1,12 @@
 [submodule "external/bgfx.cmake"]
-	path = external/bgfx.cmake
+	path = blackboard/external/bgfx.cmake
 	url = git@github.com:dashandslash/bgfx.cmake.git
 [submodule "external/imgui"]
-	path = external/imgui
+	path = blackboard/external/imgui
 	url = https://github.com/ocornut/imgui.git
 [submodule "external/SDL"]
-	path = external/SDL
+	path = blackboard/external/SDL
 	url = https://github.com/libsdl-org/SDL.git
 [submodule "external/ImGuiColorTextEdit"]
-	path = external/ImGuiColorTextEdit
+	path = blackboard/external/ImGuiColorTextEdit
 	url = https://github.com/BalazsJako/ImGuiColorTextEdit.git

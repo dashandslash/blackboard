@@ -1,13 +1,13 @@
 #define SDL_MAIN_HANDLED
 
-#include <core/app/app.h>
-#include <core/renderer/camera.h>
-#include <core/renderer/layouts.h>
-#include <core/renderer/renderer.h>
-#include <core/renderer/utils.h>
-#include <core/scene/components/animation.h>
-#include <core/scene/components/transform.h>
-#include <core/state/state.h>
+#include <blackboard/app/app.h>
+#include <blackboard/renderer/camera.h>
+#include <blackboard/renderer/layouts.h>
+#include <blackboard/renderer/renderer.h>
+#include <blackboard/renderer/utils.h>
+#include <blackboard/scene/components/animation.h>
+#include <blackboard/scene/components/transform.h>
+#include <blackboard/state/state.h>
 
 #include <entt/entt.hpp>
 #include <glm/ext.hpp>

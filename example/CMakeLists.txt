@@ -93,7 +93,7 @@ if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
         add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
             # Copy shaders
             COMMAND ${CMAKE_COMMAND} -E copy_directory
-            "${CMAKE_CURRENT_SOURCE_DIR}/../core/renderer/shaders"
+            "${CMAKE_CURRENT_SOURCE_DIR}/../blackboard/renderer/shaders"
             "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../Resources/shaders"
 
             COMMAND ${CMAKE_COMMAND} -E copy
@@ -106,7 +106,7 @@ if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
         add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
             # Copy shaders
             COMMAND ${CMAKE_COMMAND} -E copy_directory
-            "${CMAKE_CURRENT_SOURCE_DIR}/../core/renderer/shaders"
+            "${CMAKE_CURRENT_SOURCE_DIR}/../blackboard/renderer/shaders"
             "$<TARGET_FILE_DIR:${PROJECT_NAME}>/Resources/shaders"
 
             COMMAND ${CMAKE_COMMAND} -E copy

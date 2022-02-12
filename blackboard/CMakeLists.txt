@@ -48,7 +48,11 @@ target_include_directories(${PROJECT_NAME}
                            ${SDL2_IMAGE_INCLUDE_DIRS}
                            ${SDL2_TTF_INCLUDE_DIRS}
                            ${SDL2_MIXER_INCLUDE_DIRS}
-                           ${PROJECT_SOURCE_DIR}/../external/bgfx.cmake/bx/include/compat/msvc
+                           ${PROJECT_SOURCE_DIR}/external/
+                           ${PROJECT_SOURCE_DIR}/external/bgfx.cmake/bgfx/include
+                           ${PROJECT_SOURCE_DIR}/external/bgfx.cmake/bx/include
+                           ${PROJECT_SOURCE_DIR}/external/bgfx.cmake/bx/include/compat/msvc
+                           ${PROJECT_SOURCE_DIR}/external/imgui
 )
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE "-D_CRT_SECURE_NO_WARNINGS" "-D__STDC_FORMAT_MACROS" )
@@ -59,3 +63,5 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE "-D_CRT_SECURE_NO_WARNINGS" "
 #endif()
 
 add_compile_definitions(IMGUI_DEFINE_MATH_OPERATORS)
+
+add_subdirectory(external)
