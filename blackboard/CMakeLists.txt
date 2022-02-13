@@ -51,16 +51,23 @@ target_include_directories(${PROJECT_NAME}
                            ${PROJECT_SOURCE_DIR}/external/
                            ${PROJECT_SOURCE_DIR}/external/bgfx.cmake/bgfx/include
                            ${PROJECT_SOURCE_DIR}/external/bgfx.cmake/bx/include
-                           ${PROJECT_SOURCE_DIR}/external/bgfx.cmake/bx/include/compat/msvc
                            ${PROJECT_SOURCE_DIR}/external/imgui
 )
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE "-D_CRT_SECURE_NO_WARNINGS" "-D__STDC_FORMAT_MACROS" )
-# target_compile_definitions(${PROJECT_NAME} PRIVATE "-D_CRT_SECURE_NO_WARNINGS" "-D__STDC_FORMAT_MACROS") 
-
-#if(WIN32)
+if(WIN32)
 #    set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/ENTRY:\"mainCRTStartup\"" )
-#endif()
+    target_include_directories(${PROJECT_NAME}
+                               PUBLIC
+                               ${PROJECT_SOURCE_DIR}/external/bgfx.cmake/bx/include/compat/msvc
+)
+endif()
+
+target_compile_definitions(${PROJECT_NAME}
+                           PRIVATE
+                           "-D_CRT_SECURE_NO_WARNINGS"
+                           "-D__STDC_FORMAT_MACROS"
+)
+# target_compile_definitions(${PROJECT_NAME} PRIVATE "-D_CRT_SECURE_NO_WARNINGS" "-D__STDC_FORMAT_MACROS")
 
 add_compile_definitions(IMGUI_DEFINE_MATH_OPERATORS)
 
