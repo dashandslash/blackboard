@@ -1,5 +1,4 @@
 #pragma once
-
 #include <bgfx/bgfx.h>
 #include <imgui/imgui.h>
 

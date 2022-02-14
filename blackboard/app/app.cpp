@@ -5,7 +5,7 @@
 #include "renderer/platform/imgui_impl_sdl_bgfx.h"
 #include "renderer/renderer.h"
 
-#include <SDL.h>
+#include <SDL/SDL.h>
 #include <bgfx/bgfx.h>
 #include <imgui/backends/imgui_impl_sdl.h>
 

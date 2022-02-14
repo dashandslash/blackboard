@@ -1,6 +1,6 @@
 #include "window.h"
 
-#include <SDL.h>
+#include <SDL/SDL.h>
 
 namespace blackboard {
 

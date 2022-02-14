@@ -1,4 +1,7 @@
 cmake_minimum_required(VERSION 3.21)
+
+include(cmake/fetch_external_dependencies.cmake)
+
 project(core)
 
 set(SOURCES
@@ -10,7 +13,7 @@ set(SOURCES
     renderer/program.cpp
     renderer/renderer.cpp
     state/state.cpp
-    )
+)
 
 set(HEADERS 
     app/app.h
@@ -28,37 +31,36 @@ set(HEADERS
     scene/components/transform.h
     state/state.h
     utils/watchdog.h
-    )
+)
 
 add_library(${PROJECT_NAME} STATIC ${HEADERS} ${SOURCES})
 
 target_link_libraries(${PROJECT_NAME}
-                      PUBLIC
+                      PRIVATE
                       SDL2-static
                       bgfx
+                      bx
                       EnTT
-                      ImGui
+			          ImGui
                       glm
-                      range-v3::range-v3
-                      )
+)
+
 target_include_directories(${PROJECT_NAME}
                            PUBLIC
                            ${PROJECT_SOURCE_DIR}
-                           ${SDL2_INCLUDE_DIRS}
-                           ${SDL2_IMAGE_INCLUDE_DIRS}
-                           ${SDL2_TTF_INCLUDE_DIRS}
-                           ${SDL2_MIXER_INCLUDE_DIRS}
-                           ${PROJECT_SOURCE_DIR}/external/
-                           ${PROJECT_SOURCE_DIR}/external/bgfx.cmake/bgfx/include
-                           ${PROJECT_SOURCE_DIR}/external/bgfx.cmake/bx/include
-                           ${PROJECT_SOURCE_DIR}/external/imgui
+                           ${FETCHCONTENT_BASE_DIR}
+                           ${imgui_SOURCE_SYMLINK_DIR}
+                           ${bgfx_cmake_SOURCE_DIR}/bx/inlcude
+                        #    ${SDL2_INCLUDE_DIRS}
+                        #    ${SDL2_IMAGE_INCLUDE_DIRS}
+                        #    ${SDL2_TTF_INCLUDE_DIRS}
+                        #    ${SDL2_MIXER_INCLUDE_DIRS}
 )
 
 if(WIN32)
-#    set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/ENTRY:\"mainCRTStartup\"" )
-    target_include_directories(${PROJECT_NAME}
-                               PUBLIC
-                               ${PROJECT_SOURCE_DIR}/external/bgfx.cmake/bx/include/compat/msvc
+target_include_directories(${PROJECT_NAME}
+                           PUBLIC
+                           ${bgfx_cmake_SOURCE_DIR}/bx/include/compat/msvc
 )
 endif()
 
@@ -67,8 +69,7 @@ target_compile_definitions(${PROJECT_NAME}
                            "-D_CRT_SECURE_NO_WARNINGS"
                            "-D__STDC_FORMAT_MACROS"
 )
-# target_compile_definitions(${PROJECT_NAME} PRIVATE "-D_CRT_SECURE_NO_WARNINGS" "-D__STDC_FORMAT_MACROS")
 
-add_compile_definitions(IMGUI_DEFINE_MATH_OPERATORS)
+target_compile_definitions(${PROJECT_NAME} PUBLIC "BX_CONFIG_DEBUG=$<CONFIG:Debug>")
 
-add_subdirectory(external)
+target_compile_definitions(${PROJECT_NAME} PUBLIC IMGUI_DEFINE_MATH_OPERATORS)
