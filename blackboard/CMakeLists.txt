@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.21)
 
 include(cmake/fetch_external_dependencies.cmake)
 
-project(core)
+project(blackboard_lib)
 
 set(SOURCES
     app/app.cpp

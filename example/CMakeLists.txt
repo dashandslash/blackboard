@@ -9,10 +9,10 @@ project (${PROJECT_NAME})
 
 set(SOURCES
     example.cpp
-    )
+)
 
 set(HEADERS 
-    )
+)
 
 
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
@@ -31,7 +31,7 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
     target_link_libraries(${PROJECT_NAME} "-s DEMANGLE_SUPPORT=1")
     target_compile_options(${PROJECT_NAME} PUBLIC "-O2") #creates the runtime resources
     target_link_libraries(${PROJECT_NAME} "-O2") #creates the runtime resources
-    target_link_libraries(${PROJECT_NAME} core)
+    target_link_libraries(${PROJECT_NAME} blackboard_lib)
     target_link_libraries(${PROJECT_NAME} bgfx)
     target_link_libraries(${PROJECT_NAME} EnTT)
     target_link_libraries(${PROJECT_NAME} glm)
@@ -48,20 +48,19 @@ elseif(APPLE)
                           MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME}
                           MACOSX_BUNDLE_BUNDLE_VERSION "0.1"
                           MACOSX_BUNDLE_SHORT_VERSION_STRING "0.1"
-                          )
+)
 endif()
 
 if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
     
     target_link_libraries(${PROJECT_NAME}
                     PUBLIC
-                    core
+                    blackboard_lib
                     bgfx
                     bx
                     EnTT
                     glm
-                    # SDL2-static
-                    )
+)
 
     target_compile_definitions(${PROJECT_NAME} PRIVATE "-D_CRT_SECURE_NO_WARNINGS" "-D__STDC_FORMAT_MACROS")
     add_dependencies(${PROJECT_NAME} copy_assets)
