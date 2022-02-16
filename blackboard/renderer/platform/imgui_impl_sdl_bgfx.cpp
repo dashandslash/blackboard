@@ -1,6 +1,6 @@
 
 #include "imgui_impl_sdl_bgfx.h"
-#include "imgui/imgui.h"
+#include <imgui/imgui.h>
 
 #include "bgfx/bgfx.h"
 #include "bgfx/embedded_shader.h"
@@ -11,8 +11,8 @@
 #include "fs_ocornut_imgui.bin.h"
 #include "vs_ocornut_imgui.bin.h"
 
-#include <SDL.h>
-#include <SDL_syswm.h>
+#include <SDL/SDL.h>
+#include <SDL/SDL_syswm.h>
 
 #include <string>
 #include <vector>

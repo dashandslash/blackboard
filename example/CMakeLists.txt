@@ -35,7 +35,7 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
     target_link_libraries(${PROJECT_NAME} bgfx)
     target_link_libraries(${PROJECT_NAME} EnTT)
     target_link_libraries(${PROJECT_NAME} glm)
-    target_link_libraries(${PROJECT_NAME} range-v3::range-v3)
+#    target_link_libraries(${PROJECT_NAME} range-v3::range-v3)
 elseif(WIN32)
     add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 #    set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/ENTRY:\"mainCRTStartup\"" )
@@ -49,26 +49,18 @@ elseif(APPLE)
                           MACOSX_BUNDLE_BUNDLE_VERSION "0.1"
                           MACOSX_BUNDLE_SHORT_VERSION_STRING "0.1"
                           )
-    target_link_libraries(${PROJECT_NAME}
-                          PRIVATE
-                          core
-                          bgfx
-                          EnTT
-                          glm
-                          range-v3::range-v3
-                          SDL2-static
-                          )
 endif()
 
 if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
+    
     target_link_libraries(${PROJECT_NAME}
-                    PRIVATE
+                    PUBLIC
                     core
                     bgfx
+                    bx
                     EnTT
                     glm
-                    range-v3::range-v3
-                    SDL2-static
+                    # SDL2-static
                     )
 
     target_compile_definitions(${PROJECT_NAME} PRIVATE "-D_CRT_SECURE_NO_WARNINGS" "-D__STDC_FORMAT_MACROS")
@@ -86,8 +78,6 @@ if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
             "$<TARGET_FILE_DIR:${PROJECT_NAME}>/Resources/assets"
         )
     endif()
-
-        message(STATUS  "$<TARGET_FILE:shaderc>" $<TARGET_FILE:shaderc>)
 
     if(APPLE)
         add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD

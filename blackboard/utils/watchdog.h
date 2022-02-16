@@ -69,7 +69,7 @@ class WatchedFileSystemExc : public std::exception
 public:
     WatchedFileSystemExc(const ci::fs::path &path)
     {
-        sprintf(mMessage, "Failed to find file or directory at: %s", path.c_str());
+        sprintf(mMessage, "Failed to find file or directory at: %s", path.string().c_str());
     }
 
     virtual const char *what() const throw() { return mMessage; }
@@ -111,14 +111,14 @@ public:
         // if the file or directory exists change its last write time
         if (ci::fs::exists(path))
         {
-            ci::fs::last_write_time(path);
+            const auto lwt = ci::fs::last_write_time(path);
             return;
         }
         // if not, visit each path if there's a wildcard
         if (path.string().find("*") != std::string::npos)
         {
             visitWildCardPath(path, [time](const ci::fs::path &p) {
-                ci::fs::last_write_time(p);
+                const auto lwt = ci::fs::last_write_time(p);
                 return false;
             });
         }

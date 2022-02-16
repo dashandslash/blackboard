@@ -1,8 +1,10 @@
 #pragma once
 
-#include <gui/gui.h>
+#include "gui/gui.h"
 #include "platform/window.h"
 #include "renderer/renderer.h"
+
+#include <imgui/imgui.h>
 
 #include <filesystem>
 #include <functional>

@@ -1,7 +1,7 @@
 #pragma once
 #include <bgfx/bgfx.h>
 #include <bx/pixelformat.h>
-#include <range/v3/span.hpp>
+#include <span>
 
 #include <array>
 
@@ -136,8 +136,8 @@ uint32_t encode_normal_rgba8(float _x, float _y = 0.0f, float _z = 0.0f, float _
 }
 
 std::tuple<std::vector<uint16_t>, std::vector<Position_normal_barycenter>>
-  generate_position_normal_barycenter(const ranges::span<const uint16_t> &indices,
-                                      const ranges::span<const Position_normal> &layout)
+  generate_position_normal_barycenter(const std::span<const uint16_t> &indices,
+                                      const std::span<const Position_normal> &layout)
 {
     std::vector<Position_normal_barycenter> tempV;
     tempV.reserve(indices.size() * 3);

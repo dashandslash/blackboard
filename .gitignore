@@ -1,5 +1,9 @@
 ## OSX artifacts
 .DS_Store
 
-.build/
-.build_r/
+.build*/
+.vs/
+.vscode/
+.clang-format
+
+/blackboard/.external
