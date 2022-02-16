@@ -8,7 +8,7 @@ set(FETCHCONTENT_BASE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/.external)
 # <SDL
 FetchContent_Declare(
 			               sdl
-                     GIT_REPOSITORY git@github.com:libsdl-org/SDL.git
+                     GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
 			               GIT_TAG release-2.0.20
                      GIT_SHALLOW 1
 )
@@ -27,7 +27,7 @@ endif()
 # <ImGui
 FetchContent_Declare(
                      imgui
-                     GIT_REPOSITORY git@github.com:ocornut/imgui.git
+                     GIT_REPOSITORY https://github.com/ocornut/imgui.git
                      GIT_TAG docking
                      GIT_SHALLOW 1
 )
@@ -35,7 +35,7 @@ FetchContent_MakeAvailable(imgui)
 
 FetchContent_Declare(
                      imgui_color_text_edit
-                     GIT_REPOSITORY git@github.com:BalazsJako/ImGuiColorTextEdit.git
+                     GIT_REPOSITORY https://github.com/BalazsJako/ImGuiColorTextEdit.git
                      GIT_TAG master
                      GIT_SHALLOW 1
 )
@@ -91,7 +91,7 @@ include_directories(${FETCHCONTENT_BASE_DIR})
 
 FetchContent_Declare(
                      EnTT
-                     GIT_REPOSITORY git@github.com:skypjack/entt.git
+                     GIT_REPOSITORY https://github.com/skypjack/entt.git
                      GIT_TAG master
                      GIT_SHALLOW 1
 )
@@ -99,7 +99,7 @@ FetchContent_MakeAvailable(EnTT)
 
 FetchContent_Declare(
                      glm
-                     GIT_REPOSITORY git@github.com:g-truc/glm.git
+                     GIT_REPOSITORY https://github.com/g-truc/glm.git
                      GIT_TAG master
                      GIT_SHALLOW 1
 )
@@ -108,7 +108,7 @@ FetchContent_MakeAvailable(glm)
 # <bgfx
 FetchContent_Declare(
                      bgfx_cmake
-                     GIT_REPOSITORY git@github.com:bkaradzic/bgfx.cmake.git
+                     GIT_REPOSITORY https://github.com/bkaradzic/bgfx.cmake.git
                      GIT_TAG master
                      GIT_SHALLOW 1
 )
