@@ -1,4 +1,5 @@
-# [WIP] blackboard
+# [WIP] blackboard [![Build status](https://ci.appveyor.com/api/projects/status/27ciitc8s3abuk0m?svg=true)](https://ci.appveyor.com/project/dashandslash/blackboard)
+
 imgui multiviewport + bgfx 
 
 Support for:

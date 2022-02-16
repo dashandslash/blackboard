@@ -1,0 +1,29 @@
+version: 0.0.{build}
+image:
+- macOS
+- Visual Studio 2022
+
+configuration:
+  - Release
+
+for:
+  -
+    matrix:
+      only:
+        - image: macos
+
+    before_build:
+      - cmake . -G Xcode -B .build
+
+    build_script:
+      - cmake --build .build --config Release -j
+
+  -
+    matrix:
+      only:
+        - image: Visual Studio 2022
+    before_build:
+      - cmake . -G "Visual Studio 17 2022" -B .build
+
+    build_script:
+      - cmake --build .build --config Release -j
