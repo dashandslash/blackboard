@@ -46,7 +46,8 @@ bgfx::ShaderHandle loadShader(const std::filesystem::path &filePath)
 
 int compileShader(const std::filesystem::path &shaderFile, blackboard::renderer::Program::Type type)
 {
-    std::string cmd = blackboard::resources::path().append(shaderc_binary).string();    // shaderc binary
+    std::string cmd =
+      blackboard::resources::path().append(shaderc_binary).string();    // shaderc binary
     cmd.append(" -f " + shaderFile.string());    // input file
     cmd.append(" -o " + shaderFile.string() + shader_bin_extension);    // output file
     cmd.append(" -i " +
@@ -55,14 +56,14 @@ int compileShader(const std::filesystem::path &shaderFile, blackboard::renderer:
     cmd.append(shader_platform_flags);    // platform flags
     switch (type)
     {
-    case blackboard::renderer::Program::VERTEX:
-        cmd.append(shader_vertex_program_flags);    // platform flags
-        break;
-    case blackboard::renderer::Program::FRAGMENT:
-        cmd.append(shader_fragment_program_flags);    // platform flags
-        break;
-    default:
-        break;
+        case blackboard::renderer::Program::VERTEX:
+            cmd.append(shader_vertex_program_flags);    // platform flags
+            break;
+        case blackboard::renderer::Program::FRAGMENT:
+            cmd.append(shader_fragment_program_flags);    // platform flags
+            break;
+        default:
+            break;
     }
     return system(cmd.c_str());
 }

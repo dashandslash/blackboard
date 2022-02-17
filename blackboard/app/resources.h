@@ -13,7 +13,7 @@ inline std::filesystem::path path()
         return {base_path};
     }
 #else
-    if (char* base_path = SDL_GetBasePath(); base_path)
+    if (char *base_path = SDL_GetBasePath(); base_path)
     {
         return std::filesystem::path(base_path) / "Resources";
     }

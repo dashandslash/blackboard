@@ -13,7 +13,6 @@
 #include <glm/ext.hpp>
 #include <glm/gtx/matrix_interpolation.hpp>
 #include <imgui/imgui.h>
-#include <imgui/imgui_internal.h>
 
 #include <filesystem>
 #include <iostream>
@@ -28,8 +27,7 @@ renderer::CameraPersp cam;
 bgfx::FrameBufferHandle frameBufferHandle = BGFX_INVALID_HANDLE;
 renderer::material::Uniform uniform = {.u_color = {1.0, 1.0, 1.0, 1.0},
                                        .u_edge_color{0.0f, 0.0f, 0.0f, 1.0f},
-                                       .u_edge_thickness = 3.5f
-                                       };
+                                       .u_edge_thickness = 3.5f};
 State state;
 
 void init()

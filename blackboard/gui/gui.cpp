@@ -8,7 +8,6 @@
 #include <imgui/backends/imgui_impl_sdl.h>
 #include <imgui/imgui_internal.h>
 
-
 #include <iostream>
 
 namespace blackboard::gui {
