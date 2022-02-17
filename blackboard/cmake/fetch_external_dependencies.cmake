@@ -5,7 +5,7 @@ include(FetchContent)
 set(FETCHCONTENT_BASE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/.external)
 # file(MAKE_DIRECTORY ${FETCHCONTENT_BASE_DIR})
 
-# <SDL
+# SDL
 FetchContent_Declare(
 			               sdl
                      GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
@@ -22,9 +22,8 @@ if(NOT sdl_POPULATED)
 
 	add_subdirectory(${sdl_SOURCE_DIR} ${sdl_BINARY_DIR} EXCLUDE_FROM_ALL)
 endif()
-# SDL>
 
-# <ImGui
+# imgui
 FetchContent_Declare(
                      imgui
                      GIT_REPOSITORY https://github.com/ocornut/imgui.git
@@ -63,7 +62,7 @@ set(imgui_SOURCES
   )
 
 set(imgui_HEADERS
-  ${imgui_SOURCE_SYMLINK_DIR}/imconfig.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/gui/imconfig.h
   ${imgui_SOURCE_SYMLINK_DIR}/imgui.h
   ${imgui_SOURCE_SYMLINK_DIR}/imstb_rectpack.h
   ${imgui_SOURCE_SYMLINK_DIR}/imstb_truetype.h
@@ -87,8 +86,8 @@ target_include_directories(ImGui
 )
 
 include_directories(${FETCHCONTENT_BASE_DIR})
-# ImGui>
 
+# EnTT
 FetchContent_Declare(
                      EnTT
                      GIT_REPOSITORY https://github.com/skypjack/entt.git
@@ -97,6 +96,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(EnTT)
 
+# glm
 FetchContent_Declare(
                      glm
                      GIT_REPOSITORY https://github.com/g-truc/glm.git
@@ -105,7 +105,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(glm)
 
-# <bgfx
+# bgfx_cmake
 FetchContent_Declare(
                      bgfx_cmake
                      GIT_REPOSITORY https://github.com/bkaradzic/bgfx.cmake.git
@@ -124,4 +124,3 @@ if(NOT bgfx_cmake_POPULATED)
 	set( BGFX_CUSTOM_TARGETS  OFF CACHE INTERNAL "" )
 	add_subdirectory(${bgfx_cmake_SOURCE_DIR} ${bgfx_cmake_BINARY_DIR} EXCLUDE_FROM_ALL)
 endif()
-# bgfx>
