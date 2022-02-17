@@ -6,6 +6,9 @@ image:
 configuration:
   - Release
 
+build:
+  parallel: true  
+
 for:
   -
     matrix:
