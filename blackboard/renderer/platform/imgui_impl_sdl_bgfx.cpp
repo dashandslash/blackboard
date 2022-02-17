@@ -1,16 +1,14 @@
-
 #include "imgui_impl_sdl_bgfx.h"
-#include <imgui/imgui.h>
-
-#include "bgfx/bgfx.h"
-#include "bgfx/embedded_shader.h"
-#include <bx/math.h>
-//#include "bx/math.h"
-#include <bx/timer.h>
 
 #include "fs_ocornut_imgui.bin.h"
 #include "vs_ocornut_imgui.bin.h"
 
+#include <bgfx/bgfx.h>
+#include <bgfx/embedded_shader.h>
+#include <bx/math.h>
+#include <bx/timer.h>
+#include <imgui/imgui.h>
+#include <imgui/imgui_internal.h>
 #include <SDL/SDL.h>
 #include <SDL/SDL_syswm.h>
 
@@ -178,21 +176,23 @@ void ImGui_Impl_sdl_bgfx_Render(const bgfx::ViewId view_id, ImDrawData *draw_dat
     bgfx::setViewMode(view_id, bgfx::ViewMode::Sequential);
 
     // (0,0) unless using multi-viewports
-    const ImVec2 clipPos = draw_data->DisplayPos;
+    const auto clip_position = draw_data->DisplayPos;
+    const auto clip_size = draw_data->DisplaySize;
     // (1,1) unless using retina display which are often (2,2)
-    const ImVec2 clipScale = draw_data->FramebufferScale;
+    const ImVec2 clip_scale = draw_data->FramebufferScale;
+    const auto framebuffer_size = clip_size * clip_scale;
 
     const bgfx::Caps *caps = bgfx::getCaps();
     {
-        const auto L = draw_data->DisplayPos.x;
-        const auto R = L + draw_data->DisplaySize.x;
-        const auto T = draw_data->DisplayPos.y;
-        const auto B = T + draw_data->DisplaySize.y;
+        const auto L = clip_position.x;
+        const auto R = L + clip_size.x;
+        const auto T = clip_position.y;
+        const auto B = T + clip_size.y;
         float ortho[16];
         bx::mtxOrtho(ortho, L, R, B, T, 0.0f, 1000.0f, 0.0f, bgfx::getCaps()->homogeneousDepth);
         bgfx::setViewTransform(view_id, nullptr, ortho);
-        bgfx::setViewRect(view_id, 0, 0, (uint16_t)draw_data->DisplaySize.x * clipScale.x,
-                          (uint16_t)draw_data->DisplaySize.y * clipScale.y);
+        bgfx::setViewRect(view_id, 0, 0, static_cast<uint16_t>(clip_size.x * clip_scale.x),
+                          static_cast<uint16_t>(clip_size.y * clip_scale.y));
     }
 
     // draw_data->ScaleClipRects(clipScale);
@@ -262,25 +262,20 @@ void ImGui_Impl_sdl_bgfx_Render(const bgfx::ViewId view_id, ImDrawData *draw_dat
 
                 // Project scissor/clipping rectangles into framebuffer space
                 ImVec4 clipRect;
-                clipRect.x = (cmd->ClipRect.x - clipPos.x) * clipScale.x;
-                clipRect.y = (cmd->ClipRect.y - clipPos.y) * clipScale.y;
-                clipRect.z = (cmd->ClipRect.z - clipPos.x) * clipScale.x;
-                clipRect.w = (cmd->ClipRect.w - clipPos.y) * clipScale.y;
-                int fb_width = (int)(draw_data->DisplaySize.x * draw_data->FramebufferScale.x);
-                int fb_height = (int)(draw_data->DisplaySize.y * draw_data->FramebufferScale.y);
+                clipRect.x = (cmd->ClipRect.x - clip_position.x) * clip_scale.x;
+                clipRect.y = (cmd->ClipRect.y - clip_position.y) * clip_scale.y;
+                clipRect.z = (cmd->ClipRect.z - clip_position.x) * clip_scale.x;
+                clipRect.w = (cmd->ClipRect.w - clip_position.y) * clip_scale.y;
 
-                //                if (clipRect.x <  fb_width
-                //                &&  clipRect.y <  fb_height
-                //                &&  clipRect.z >= 0.0f
-                //                &&  clipRect.w >= 0.0f)
+                if (clipRect.x < framebuffer_size.x && clipRect.y < framebuffer_size.y &&
+                    clipRect.z >= 0.0f && clipRect.w >= 0.0f)
                 {
-                    const auto position = draw_data->DisplayPos;
-                    const uint16_t x(bx::max(cmd->ClipRect.x, 0.0f) - position.x);
-                    const uint16_t y(bx::max(cmd->ClipRect.y, 0.0f) - position.y);
-                    const uint16_t width(bx::min(cmd->ClipRect.z, 65535.0f) - position.x - x);
-                    const uint16_t height(bx::min(cmd->ClipRect.w, 65535.0f) - position.y - y);
-                    encoder->setScissor(x * clipScale.x, y * clipScale.x, width * clipScale.x,
-                                        height * clipScale.x);
+                    const uint16_t x(bx::max(cmd->ClipRect.x - clip_position.x, 0.0f));
+                    const uint16_t y(bx::max(cmd->ClipRect.y - clip_position.y, 0.0f));
+                    const uint16_t width(bx::min(cmd->ClipRect.z - clip_position.x - x, 65535.0f));
+                    const uint16_t height(bx::min(cmd->ClipRect.w - clip_position.y - y, 65535.0f));
+                    encoder->setScissor(x * clip_scale.x, y * clip_scale.x, width * clip_scale.x,
+                                        height * clip_scale.x);
 
                     encoder->setState(state);
                     encoder->setTexture(0, uniform_texture, texture_handle, sampler_state);
