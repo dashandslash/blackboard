@@ -8,6 +8,7 @@
 #include <SDL/SDL.h>
 #include <bgfx/bgfx.h>
 #include <imgui/backends/imgui_impl_sdl.h>
+#include <imgui/imgui_internal.h>
 
 #include <iostream>
 
@@ -31,11 +32,8 @@ App::App(const char *app_name, const renderer::Api renderer_api, const uint16_t 
 
     gui::init();
 
-    if (m_window.window)
-    {
-        renderer::init(m_window.window, renderer_api, m_window.width, m_window.height);
-        renderer::ImGui_Impl_sdl_bgfx_Init(m_window.imgui_view_id);
-    }
+    renderer::init(m_window, renderer_api, m_window.width, m_window.height);
+    renderer::ImGui_Impl_sdl_bgfx_Init(m_window.imgui_view_id);
 
     ImGui_ImplSDL2_InitForMetal(m_window.window);
 }
@@ -44,10 +42,7 @@ void App::run()
 {
     on_init();
     ImGui::LoadIniSettingsFromDisk((resources::path() / "imgui.ini").string().c_str());
-    int drawable_width{0};
-    int drawable_height{0};
-    SDL_Metal_GetDrawableSize(m_window.window, &drawable_width, &drawable_height);
-    SDL_GetWindowPosition(m_window.window, &m_window.window_x, &m_window.window_y);
+    const auto [drawable_width, drawable_height] = m_window.get_size_in_pixels();
     on_resize(drawable_width, drawable_height);
 
     SDL_Event event;
@@ -68,42 +63,12 @@ void App::run()
                 const auto height = event.window.data2;
                 m_window.width = width;
                 m_window.height = height;
-                auto window = SDL_GetWindowFromID(event.window.windowID);
-                renderer::ImGui_Impl_sdl_bgfx_Resize(window);
-                int drawable_width{0};
-                int drawable_height{0};
-                SDL_Metal_GetDrawableSize(window, &drawable_width, &drawable_height);
+                renderer::ImGui_Impl_sdl_bgfx_Resize(m_window.window);
+                const auto [drawable_width, drawable_height] = m_window.get_size_in_pixels();
                 on_resize(drawable_width, drawable_height);
             }
-#if 0
-            if (event.type == SDL_MOUSEMOTION) {
-                m_window.prev_mouse_x = m_window.mouse_x;
-                m_window.prev_mouse_y = m_window.mouse_y;
-                SDL_GetGlobalMouseState( &m_window.mouse_x, &m_window.mouse_y );
-
-                if (m_window.is_dragging) {
-                    m_window.window_x += m_window.mouse_x - m_window.prev_mouse_x;
-                    m_window.window_y += m_window.mouse_y - m_window.prev_mouse_y;
-                    
-                    SDL_SetWindowPosition(m_window.window, m_window.window_x, m_window.window_y);
-                }
-            }
-            if (event.type == SDL_MOUSEBUTTONDOWN)
-            {
-                m_window.prev_mouse_x = m_window.mouse_x;
-                m_window.prev_mouse_y = m_window.mouse_y;
-                SDL_GetGlobalMouseState( &m_window.mouse_x, &m_window.mouse_y );
-                m_window.is_dragging = true;
-            }
-            if (event.type == SDL_MOUSEBUTTONUP)
-            {
-                m_window.prev_mouse_x = m_window.mouse_x;
-                m_window.prev_mouse_y = m_window.mouse_y;
-                SDL_GetGlobalMouseState( &m_window.mouse_x, &m_window.mouse_y );
-                m_window.is_dragging = false;
-            }
-#endif
         }
+
         renderer::ImGui_Impl_sdl_bgfx_NewFrame();
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();

@@ -154,7 +154,7 @@ void ImGui_Impl_sdl_bgfx_Resize(SDL_Window *window)
 {
     int drawable_width{0};
     int drawable_height{0};
-    SDL_Metal_GetDrawableSize(window, &drawable_width, &drawable_height);
+    SDL_GL_GetDrawableSize(window, &drawable_width, &drawable_height);
     ImGuiIO &io = ImGui::GetIO();
     io.DisplaySize = ImVec2((float)drawable_width, (float)drawable_height);
     bgfx::reset(drawable_width, drawable_height,

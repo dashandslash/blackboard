@@ -1,6 +1,7 @@
 #include "renderer.h"
 
 #include "platform/imgui_impl_sdl_bgfx.h"
+#include "platform/window.h"
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_syswm.h>
@@ -13,15 +14,15 @@
 namespace blackboard {
 namespace renderer {
 
-bool init(SDL_Window *window, const Api renderer_api, const uint16_t width, const uint16_t height)
+bool init(Window &window, const Api renderer_api, const uint16_t width, const uint16_t height)
 {
-    SDL_SysWMinfo wmi;
-    SDL_VERSION(&wmi.version);
-    if (!SDL_GetWindowWMInfo(window, &wmi))
-    {
-        std::cout << "SDL_SysWMinfo could not be retrieved. SDL_Error: " << SDL_GetError() << std::endl;
-        return false;
-    }
+    //    SDL_SysWMinfo wmi;
+    //    SDL_VERSION(&wmi.version);
+    //    if (!SDL_GetWindowWMInfo(window.window, &wmi))
+    //    {
+    //        std::cout << "SDL_SysWMinfo could not be retrieved. SDL_Error: " << SDL_GetError() << std::endl;
+    //        return false;
+    //    }
 
     bgfx::PlatformData pd{};
     bgfx::Init bgfx_init;
@@ -41,12 +42,10 @@ bool init(SDL_Window *window, const Api renderer_api, const uint16_t width, cons
             bgfx_init.type = bgfx::RendererType::Count;    // auto choose renderer
             break;
     }
-    int width_{0};
-    int height_{0};
-    SDL_GL_GetDrawableSize(window, &width_, &height_);
-    bgfx_init.resolution.width = width_;
-    bgfx_init.resolution.height = height_;
-    pd.nwh = renderer::native_window_handle(window);
+    const auto [drawable_width, drawable_height] = window.get_size_in_pixels();
+    bgfx_init.resolution.width = drawable_width;
+    bgfx_init.resolution.height = drawable_height;
+    pd.nwh = renderer::native_window_handle(window.window);
     bgfx_init.resolution.numBackBuffers = 1;
 
     bgfx_init.resolution.reset = BGFX_RESET_VSYNC | BGFX_RESET_HIDPI | BGFX_RESET_MSAA_X4;
@@ -55,7 +54,7 @@ bool init(SDL_Window *window, const Api renderer_api, const uint16_t width, cons
 
     bgfx::setDebug(BGFX_DEBUG_TEXT);
     bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x000000FF, 1.0f, 0);
-    bgfx::setViewRect(0, 0, 0, width_, height_);
+    bgfx::setViewRect(0, 0, 0, drawable_width, drawable_height);
 
     return true;
 }

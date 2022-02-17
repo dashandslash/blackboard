@@ -13,8 +13,6 @@
 
 namespace blackboard {
 
-using WindowType = SDL_Window;
-
 class App
 {
 public:
@@ -42,7 +40,7 @@ public:
     }
 
 protected:
-    Window<WindowType> m_window;
+    Window m_window;
     bool m_running{true};
     uint32_t m_update_rate{16};
     renderer::Api m_renderer_api{renderer::Api::none};

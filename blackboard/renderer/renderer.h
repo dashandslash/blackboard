@@ -6,6 +6,9 @@
 struct SDL_Window;
 
 namespace blackboard {
+
+struct Window;
+
 namespace renderer {
 
 enum class Api : uint8_t
@@ -17,7 +20,7 @@ enum class Api : uint8_t
     count
 };
 
-bool init(SDL_Window *window, const Api, const uint16_t width, const uint16_t height);
+bool init(Window &window, const Api, const uint16_t width, const uint16_t height);
 
 inline renderer::material::Manager &material_manager()
 {
