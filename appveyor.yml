@@ -9,14 +9,14 @@ configuration:
 build:
   parallel: true
 
-cache:
-  - blackboard/.external -> .external_packages.json
-
 for:
   -
     matrix:
       only:
         - image: macos-bigsur
+    
+    cache:
+      - .external -> .external_packages.json
 
     before_build:
       - cmake . -G Xcode -B .build
@@ -28,6 +28,10 @@ for:
     matrix:
       only:
         - image: Visual Studio 2022
+
+    cache:
+      - .external -> .external_packages.json
+
     before_build:
       - cmake . -G "Visual Studio 17 2022" -B .build
 

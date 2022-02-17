@@ -1,4 +1,7 @@
 cmake_minimum_required(VERSION 3.21)
+
+include(cmake/fetch_external_dependencies.cmake)
+
 set(PROJECT_NAME blackboard)
 
 project(${PROJECT_NAME})

@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.21)
 
 include(FetchContent)
 set(FETCHCONTENT_QUIET off)
+
 set(FETCHCONTENT_BASE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/.external)
-# file(MAKE_DIRECTORY ${FETCHCONTENT_BASE_DIR})
 
 # SDL
 FetchContent_Declare(
@@ -62,7 +62,7 @@ set(imgui_SOURCES
   )
 
 set(imgui_HEADERS
-  ${CMAKE_CURRENT_SOURCE_DIR}/gui/imconfig.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/blackboard/gui/imconfig.h
   ${imgui_SOURCE_SYMLINK_DIR}/imgui.h
   ${imgui_SOURCE_SYMLINK_DIR}/imstb_rectpack.h
   ${imgui_SOURCE_SYMLINK_DIR}/imstb_truetype.h
@@ -124,3 +124,5 @@ if(NOT bgfx_cmake_POPULATED)
 	set( BGFX_CUSTOM_TARGETS  OFF CACHE INTERNAL "" )
 	add_subdirectory(${bgfx_cmake_SOURCE_DIR} ${bgfx_cmake_BINARY_DIR} EXCLUDE_FROM_ALL)
 endif()
+
+message(STATUS "bgfx_cmake_SOURCE_DIR: ${bgfx_cmake_SOURCE_DIR}")
