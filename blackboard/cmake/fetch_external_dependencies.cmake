@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.21)
 
 include(FetchContent)
-
+set(FETCHCONTENT_QUIET off)
 set(FETCHCONTENT_BASE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/.external)
 # file(MAKE_DIRECTORY ${FETCHCONTENT_BASE_DIR})
 
