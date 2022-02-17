@@ -32,13 +32,13 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(imgui)
 
-FetchContent_Declare(
-                     imgui_color_text_edit
-                     GIT_REPOSITORY https://github.com/BalazsJako/ImGuiColorTextEdit.git
-                     GIT_TAG master
-                     GIT_SHALLOW 1
-)
-FetchContent_MakeAvailable(imgui_color_text_edit)
+# FetchContent_Declare(
+#                      imgui_color_text_edit
+#                      GIT_REPOSITORY https://github.com/BalazsJako/ImGuiColorTextEdit.git
+#                      GIT_TAG master
+#                      GIT_SHALLOW 1
+# )
+# FetchContent_MakeAvailable(imgui_color_text_edit)
 
 execute_process(
     COMMAND ${CMAKE_COMMAND} -E create_symlink ${SDL2_SOURCE_DIR}/include ${FETCHCONTENT_BASE_DIR}/SDL 
@@ -58,7 +58,7 @@ set(imgui_SOURCES
   ${imgui_SOURCE_SYMLINK_DIR}/imgui_widgets.cpp
   ${imgui_SOURCE_SYMLINK_DIR}/misc/cpp/imgui_stdlib.cpp
   ${imgui_SOURCE_SYMLINK_DIR}/backends/imgui_impl_sdl.cpp
-  ${imgui_color_text_edit_SOURCE_DIR}/TextEditor.cpp
+  # ${imgui_color_text_edit_SOURCE_DIR}/TextEditor.cpp
   )
 
 set(imgui_HEADERS
@@ -70,7 +70,7 @@ set(imgui_HEADERS
   ${imgui_SOURCE_SYMLINK_DIR}/imstb_textedit.h
   ${imgui_SOURCE_SYMLINK_DIR}/backends/imgui_impl_sdl.h
   ${imgui_SOURCE_SYMLINK_DIR}/misc/cpp/imgui_stdlib.h
-  ${imgui_color_text_edit_SOURCE_DIR}/TextEditor.h
+  # ${imgui_color_text_edit_SOURCE_DIR}/TextEditor.h
   )
 
 add_library(ImGui STATIC ${imgui_SOURCES} ${imgui_HEADERS})
