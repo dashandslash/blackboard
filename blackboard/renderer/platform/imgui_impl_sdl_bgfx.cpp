@@ -3,14 +3,14 @@
 #include "fs_ocornut_imgui.bin.h"
 #include "vs_ocornut_imgui.bin.h"
 
+#include <SDL/SDL.h>
+#include <SDL/SDL_syswm.h>
 #include <bgfx/bgfx.h>
 #include <bgfx/embedded_shader.h>
 #include <bx/math.h>
 #include <bx/timer.h>
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
-#include <SDL/SDL.h>
-#include <SDL/SDL_syswm.h>
 
 #include <string>
 #include <vector>
