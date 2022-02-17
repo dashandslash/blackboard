@@ -1,6 +1,6 @@
 version: 0.0.{build}
 image:
-- macOS
+- macos-bigsur
 - Visual Studio 2022
 
 configuration:
@@ -13,7 +13,7 @@ for:
   -
     matrix:
       only:
-        - image: macos
+        - image: macos-bigsur
 
     before_build:
       - cmake . -G Xcode -B .build
