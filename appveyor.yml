@@ -7,7 +7,10 @@ configuration:
   - Release
 
 build:
-  parallel: true  
+  parallel: true
+
+cache:
+  - blackboard/.external -> .external_packages.json
 
 for:
   -
