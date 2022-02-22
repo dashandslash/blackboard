@@ -62,7 +62,10 @@ void init()
     tr_end.rotation = glm::quat({350.0f, 0.0f, 359.0f});
     tr_end.translation = glm::vec3{5.0f, 0.0f, 0.0f};
 
-    state.emplace_component<components::Animation<components::Transform>>(e, 3000.0f, tr_start, tr_end);
+    auto &anim_comp = state.emplace_component<components::Animation<components::Transform>>(
+      e, 3000.0f, tr_start, tr_end, blackboard::Easing::OutExpo);
+    anim_comp.ping_pong = true;
+    anim_comp.loop = true;
 }
 
 void render_ui()
@@ -107,9 +110,13 @@ void update()
          components::Animation<components::Transform> &anim) {
           anim.tick(App::delta_time());
 
-          transform.set_transform(
-            glm::interpolate(anim.start_value().get_transform(), anim.end_value().get_transform(),
-                             glm::clamp(anim.curr_time / anim.end_time(), 0.0f, 1.0f)));
+          transform.set_transform(glm::interpolate(anim.start_value().get_transform(),
+                                                   anim.end_value().get_transform(), anim.curr_time()));
+          if (anim.completed)
+          {
+              anim.set_easing(static_cast<Easing>(std::rand() % Easing::Count));
+              anim.reset();
+          }
       });
 
     state.view<components::Transform>().each([](const auto, components::Transform transform) {
