@@ -19,7 +19,8 @@ struct Transform
 
     Transform() = default;
     Transform(const Transform &other) = default;
-    Transform(const glm::vec3 &t): translation(t) {}
+    Transform(const glm::vec3 &t): translation(t)
+    {}
 
     glm::mat4 get_transform() const
     {

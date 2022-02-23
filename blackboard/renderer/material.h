@@ -42,13 +42,23 @@ struct Material
         init();
     }
 
-    ~Material() {}
+    ~Material()
+    {}
 
-    void init() { shader_prog.init(m_vert_path, m_frag_path); }
+    void init()
+    {
+        shader_prog.init(m_vert_path, m_frag_path);
+    }
 
-    const bgfx::ProgramHandle program_handle() const { return shader_prog.program(); }
+    const bgfx::ProgramHandle program_handle() const
+    {
+        return shader_prog.program();
+    }
 
-    const bool isValid() const { return bgfx::isValid(shader_prog.program()); }
+    const bool isValid() const
+    {
+        return bgfx::isValid(shader_prog.program());
+    }
 
     std::tuple<std::filesystem::path, std::filesystem::path> paths() const
     {
@@ -98,7 +108,10 @@ struct Manager
         }
     }
 
-    ~Manager() { shutdown(); }
+    ~Manager()
+    {
+        shutdown();
+    }
 
     inline void shutdown()
     {

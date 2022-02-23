@@ -1,6 +1,7 @@
 #define SDL_MAIN_HANDLED
 
 #include <blackboard/app/app.h>
+#include <blackboard/meta/meta.h>
 #include <blackboard/renderer/camera.h>
 #include <blackboard/renderer/layouts.h>
 #include <blackboard/renderer/renderer.h>
@@ -93,7 +94,7 @@ void render_ui()
 
 void update()
 {
-    cam.setEyePoint({0.0, 0.0, -8.0f});
+    cam.setEyePoint({0.0, 0.0, -12.0f});
     cam.setPerspective(40.0f, 1280.0f / 720.0f, 0.1f, 1000.0f);
     cam.lookAt({0.0f, 0.0f, 0.0f});
 

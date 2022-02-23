@@ -72,7 +72,10 @@ public:
         sprintf(mMessage, "Failed to find file or directory at: %s", path.string().c_str());
     }
 
-    virtual const char *what() const throw() { return mMessage; }
+    virtual const char *what() const throw()
+    {
+        return mMessage;
+    }
 
     char mMessage[4096];
 };
@@ -95,11 +98,20 @@ public:
         watchImpl(path, std::function<void(const ci::fs::path &)>(), callback);
     }
     //! Closes all the previously created Watchdogs
-    ~Watchdog() { close(); }
+    ~Watchdog()
+    {
+        close();
+    }
     //! Unwatches a previously registrated file or directory
-    static void unwatch(const ci::fs::path &path) { watchImpl(path); }
+    static void unwatch(const ci::fs::path &path)
+    {
+        watchImpl(path);
+    }
     //! Unwatches all previously registrated file or directory
-    static void unwatchAll() { watchImpl(ci::fs::path()); }
+    static void unwatchAll()
+    {
+        watchImpl(ci::fs::path());
+    }
     //! Sets the last modification time of a file or directory. by default sets the time to the current time
 #if defined(CINDER_WINRT) || (defined(_MSC_VER) && (_MSC_VER >= 1900))
     static void touch(const ci::fs::path &path,
@@ -130,7 +142,8 @@ public:
     }
 
 protected:
-    Watchdog(): mWatching(false) {}
+    Watchdog(): mWatching(false)
+    {}
 
     void close()
     {
@@ -488,13 +501,16 @@ public:
         }
     }
     //! does nothing
-    static void unwatch(const ci::fs::path &path) {}
+    static void unwatch(const ci::fs::path &path)
+    {}
 
     //! does nothing
-    static void unwatchAll() {}
+    static void unwatchAll()
+    {}
 
     //! does nothing
-    static void touch(const ci::fs::path &path, std::time_t time = std::time(nullptr)) {}
+    static void touch(const ci::fs::path &path, std::time_t time = std::time(nullptr))
+    {}
 };
 
 // defines the macro that allow to change the RELEASE/DEBUG behavior

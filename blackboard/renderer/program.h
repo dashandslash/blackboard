@@ -15,7 +15,8 @@ struct Program
         COUNT
     };
 
-    Program(): m_vsh(BGFX_INVALID_HANDLE), m_fsh(BGFX_INVALID_HANDLE), m_program(BGFX_INVALID_HANDLE) {}
+    Program(): m_vsh(BGFX_INVALID_HANDLE), m_fsh(BGFX_INVALID_HANDLE), m_program(BGFX_INVALID_HANDLE)
+    {}
 
     ~Program()
     {

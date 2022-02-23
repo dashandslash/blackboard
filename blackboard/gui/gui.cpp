@@ -1,5 +1,6 @@
 #include "gui.h"
 
+#include "meta/meta.h"
 #include "renderer/platform/imgui_impl_sdl_bgfx.h"
 
 #include <SDL/SDL.h>
@@ -113,7 +114,7 @@ void set_dracula_theme()
     colors[ImGuiCol_PlotLinesHovered] = yellow * ImVec4(1.2f, 1.2f, 1.2f, 1.2f);
     colors[ImGuiCol_PlotHistogram] = yellow;
     colors[ImGuiCol_PlotHistogramHovered] = yellow * ImVec4(1.2f, 1.2f, 1.2f, 1.2f);
-    ;
+
     colors[ImGuiCol_DragDropTarget] = red;
 
     colors[ImGuiCol_NavHighlight] = red;
@@ -133,6 +134,10 @@ void set_dracula_theme()
 
     colors[ImGuiCol_DockingEmptyBg] = dark_background;
     colors[ImGuiCol_DockingPreview] = dark_alpha_purple;
+
+    colors[ImGuiCol_TableHeaderBg] = comment;
+    colors[ImGuiCol_TableBorderLight] = dark_alpha_purple;
+    colors[ImGuiCol_TableBorderStrong] = dark_alpha_purple;
 }
 
 void load_font(const std::filesystem::path &path, const float size, const bool set_as_default)
@@ -154,11 +159,42 @@ void load_font(const std::filesystem::path &path, const float size, const bool s
     }
 }
 
+void reflection_inspector()
+{
+    ImGui::Begin("Reflection inspector");
+    if (ImGui::CollapsingHeader("Components"))
+    {
+        static const auto flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable |
+                                  ImGuiTableFlags_Hideable | ImGuiTableFlags_Sortable |
+                                  ImGuiTableFlags_SortMulti;
+
+        if (ImGui::BeginTable("Reflection_table", 2, flags))
+        {
+            ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_DefaultSort);
+            ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_NoSort);
+            ImGui::TableHeadersRow();
+
+            for (const auto &entry : meta::get_reflected_components_infos())
+            {
+                ImGui::TableNextRow();
+                ImGui::TableNextColumn();
+                ImGui::Text("%s", entry.name.data());
+                ImGui::TableNextColumn();
+                ImGui::Text("%s", entry.type_name.data());
+            }
+            ImGui::EndTable();
+        }
+    }
+    ImGui::End();
+}
+
 void dockspace()
 {
     static bool opt_fullscreen{true};
     static bool opt_padding{false};
     static bool show_demo_window{false};
+    static bool show_reflection_inspector{false};
+
     static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
 
     ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
@@ -242,7 +278,8 @@ void dockspace()
 
         if (ImGui::BeginMenu("Tools"))
         {
-            ImGui::MenuItem("Show demo window", NULL, &show_demo_window);
+            ImGui::MenuItem("Show reflection inspector", NULL, &show_reflection_inspector);
+            ImGui::MenuItem("Show ImGui demo window", NULL, &show_demo_window);
             ImGui::EndMenu();
         }
 
@@ -253,6 +290,11 @@ void dockspace()
     if (show_demo_window)
     {
         ImGui::ShowDemoWindow();
+    }
+
+    if (show_reflection_inspector)
+    {
+        reflection_inspector();
     }
 }
 

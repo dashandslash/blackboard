@@ -18,9 +18,15 @@ struct Animation
         set_easing(easing);
     }
 
-    decltype(auto) start_value() const { return m_start_value; }
+    decltype(auto) start_value() const
+    {
+        return m_start_value;
+    }
 
-    decltype(auto) end_value() const { return m_end_value; }
+    decltype(auto) end_value() const
+    {
+        return m_end_value;
+    }
 
     float current_time() const
     {

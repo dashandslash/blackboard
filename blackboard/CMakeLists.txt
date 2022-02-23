@@ -6,10 +6,12 @@ set(SOURCES
     app/app.cpp
     gui/gui.cpp
     platform/window.cpp
+    meta/meta.cpp
     renderer/camera.cpp
     renderer/platform/imgui_impl_sdl_bgfx.cpp
     renderer/program.cpp
     renderer/renderer.cpp
+    scene/components/animation.cpp
     state/state.cpp
 )
 
@@ -18,6 +20,7 @@ set(HEADERS
     app/resources.h
     gui/gui.h
     platform/window.h
+    meta/meta.h
     renderer/platform/imgui_impl_sdl_bgfx.h
     renderer/camera.h
     renderer/material.h

@@ -1,11 +1,20 @@
 #pragma once
+#include <entt/core/hashed_string.hpp>
 #include <entt/entt.hpp>
+#include <entt/meta/factory.hpp>
+#include <entt/meta/meta.hpp>
+#include <entt/meta/resolve.hpp>
+
+#include <iostream>
+#include <string>
 
 struct SDL_Window;
 
 namespace blackboard {
 struct State
 {
+    State();
+
     using entity_type = entt::registry::entity_type;
 
     entt::entity create_entity();

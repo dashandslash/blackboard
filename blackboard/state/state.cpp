@@ -1,6 +1,16 @@
 #include "state.h"
 
+#include "meta/meta.h"
+#include "scene/components/animation.h"
+#include "scene/components/transform.h"
+
 namespace blackboard {
+
+State::State()
+{
+    meta::register_component<components::Transform>("Transform");
+    meta::register_component<components::Animation<components::Transform>>("Animation_Transform");
+}
 
 entt::entity State::create_entity()
 {

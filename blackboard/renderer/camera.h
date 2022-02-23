@@ -9,15 +9,22 @@ namespace blackboard::renderer {
 class Camera
 {
 public:
-    virtual ~Camera() {}
+    virtual ~Camera()
+    {}
 
     //! Returns the position in world-space from which the Camera is viewing
-    glm::vec3 getEyePoint() const { return mEyePoint; }
+    glm::vec3 getEyePoint() const
+    {
+        return mEyePoint;
+    }
     //! Sets the position in world-space from which the Camera is viewing
     void setEyePoint(const glm::vec3 &eyePoint);
 
     //! Returns the vector in world-space which represents "up" - typically glm::vec3( 0, 1, 0 )
-    glm::vec3 getWorldUp() const { return mWorldUp; }
+    glm::vec3 getWorldUp() const
+    {
+        return mWorldUp;
+    }
     //! Sets the vector in world-space which represents "up" - typically glm::vec3( 0, 1, 0 )
     void setWorldUp(const glm::vec3 &worldUp);
 
@@ -28,17 +35,26 @@ public:
     //! Modifies the eyePoint and view direction to look from \a eyePoint to \a target with up vector \a up (to achieve camera roll). Also updates the pivot distance.
     void lookAt(const glm::vec3 &eyePoint, const glm::vec3 &target, const glm::vec3 &up);
     //! Returns the world-space vector along which the camera is oriented
-    glm::vec3 getViewDirection() const { return mViewDirection; }
+    glm::vec3 getViewDirection() const
+    {
+        return mViewDirection;
+    }
     //! Sets the world-space vector along which the camera is oriented
     void setViewDirection(const glm::vec3 &viewDirection);
 
     //! Returns the world-space quaternion that expresses the camera's orientation
-    glm::quat getOrientation() const { return mOrientation; }
+    glm::quat getOrientation() const
+    {
+        return mOrientation;
+    }
     //! Sets the camera's orientation with world-space quaternion \a orientation
     void setOrientation(const glm::quat &orientation);
 
     //! Returns the camera's vertical field of view measured in degrees.
-    float getFov() const { return mFov; }
+    float getFov() const
+    {
+        return mFov;
+    }
     //! Sets the camera's vertical field of view measured in degrees.
     void setFov(float verticalFov)
     {
@@ -60,14 +76,26 @@ public:
     float getFocalLength() const;
 
     //! Primarily for user interaction, such as with CameraUi. Returns the distance from the camera along the view direction relative to which tumbling and dollying occur.
-    float getPivotDistance() const { return mPivotDistance; }
+    float getPivotDistance() const
+    {
+        return mPivotDistance;
+    }
     //! Primarily for user interaction, such as with CameraUi. Sets the distance from the camera along the view direction relative to which tumbling and dollying occur.
-    void setPivotDistance(float distance) { mPivotDistance = distance; }
+    void setPivotDistance(float distance)
+    {
+        mPivotDistance = distance;
+    }
     //! Primarily for user interaction, such as with CameraUi. Returns the world-space point relative to which tumbling and dollying occur.
-    glm::vec3 getPivotPoint() const { return mEyePoint + mViewDirection * mPivotDistance; }
+    glm::vec3 getPivotPoint() const
+    {
+        return mEyePoint + mViewDirection * mPivotDistance;
+    }
 
     //! Returns the aspect ratio of the image plane - its width divided by its height
-    float getAspectRatio() const { return mAspectRatio; }
+    float getAspectRatio() const
+    {
+        return mAspectRatio;
+    }
     //! Sets the aspect ratio of the image plane - its width divided by its height
     void setAspectRatio(float aAspectRatio)
     {
@@ -75,7 +103,10 @@ public:
         mProjectionCached = false;
     }
     //! Returns the distance along the view direction to the Near clipping plane.
-    float getNearClip() const { return mNearClip; }
+    float getNearClip() const
+    {
+        return mNearClip;
+    }
     //! Sets the distance along the view direction to the Near clipping plane.
     void setNearClip(float nearClip)
     {
@@ -83,7 +114,10 @@ public:
         mProjectionCached = false;
     }
     //! Returns the distance along the view direction to the Far clipping plane.
-    float getFarClip() const { return mFarClip; }
+    float getFarClip() const
+    {
+        return mFarClip;
+    }
     //! Sets the distance along the view direction to the Far clipping plane.
     void setFarClip(float farClip)
     {
@@ -236,7 +270,10 @@ public:
     /** Returns both the horizontal and vertical lens shift.
 		A horizontal lens shift of 1 (-1) will shift the view right (left) by half the width of the viewport.
 		A vertical lens shift of 1 (-1) will shift the view up (down) by half the height of the viewport. */
-    glm::vec2 getLensShift() const { return glm::vec2(mLensShift.x, mLensShift.y); }
+    glm::vec2 getLensShift() const
+    {
+        return glm::vec2(mLensShift.x, mLensShift.y);
+    }
     /** Sets both the horizontal and vertical lens shift.
 		A horizontal lens shift of 1 (-1) will shift the view right (left) by half the width of the viewport.
 		A vertical lens shift of 1 (-1) will shift the view up (down) by half the height of the viewport. */
@@ -244,19 +281,37 @@ public:
     /** Sets both the horizontal and vertical lens shift.
 		A horizontal lens shift of 1 (-1) will shift the view right (left) by half the width of the viewport.
 		A vertical lens shift of 1 (-1) will shift the view up (down) by half the height of the viewport. */
-    void setLensShift(const glm::vec2 &shift) { setLensShift(shift.x, shift.y); }
+    void setLensShift(const glm::vec2 &shift)
+    {
+        setLensShift(shift.x, shift.y);
+    }
     //! Returns the horizontal lens shift. A horizontal lens shift of 1 (-1) will shift the view right (left) by half the width of the viewport.
-    float getLensShiftHorizontal() const { return mLensShift.x; }
+    float getLensShiftHorizontal() const
+    {
+        return mLensShift.x;
+    }
     /** Sets the horizontal lens shift.
 		A horizontal lens shift of 1 (-1) will shift the view right (left) by half the width of the viewport. */
-    void setLensShiftHorizontal(float horizontal) { setLensShift(horizontal, mLensShift.y); }
+    void setLensShiftHorizontal(float horizontal)
+    {
+        setLensShift(horizontal, mLensShift.y);
+    }
     //! Returns the vertical lens shift. A vertical lens shift of 1 (-1) will shift the view up (down) by half the height of the viewport.
-    float getLensShiftVertical() const { return mLensShift.y; }
+    float getLensShiftVertical() const
+    {
+        return mLensShift.y;
+    }
     /** Sets the vertical lens shift.
 		A vertical lens shift of 1 (-1) will shift the view up (down) by half the height of the viewport. */
-    void setLensShiftVertical(float vertical) { setLensShift(mLensShift.x, vertical); }
+    void setLensShiftVertical(float vertical)
+    {
+        setLensShift(mLensShift.x, vertical);
+    }
 
-    bool isPersp() const override { return true; }
+    bool isPersp() const override
+    {
+        return true;
+    }
 
     //! Returns a Camera whose eyePoint is positioned to exactly frame \a worldSpaceSphere but is equivalent in other parameters (including orientation). Sets the result's pivotDistance to be the distance to \a worldSpaceSphere's center.
     //	CameraPersp		calcFraming( const Sphere &worldSpaceSphere ) const;
