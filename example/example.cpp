@@ -62,6 +62,7 @@ void init()
     auto tr_end = components::Transform();
     tr_end.rotation = glm::quat({350.0f, 0.0f, 359.0f});
     tr_end.translation = glm::vec3{5.0f, 0.0f, 0.0f};
+    tr_end.scale = glm::vec3{.10f, 0.10f, 0.10f};
 
     auto &anim_comp = state.emplace_component<components::Animation<components::Transform>>(
       e, 3000.0f, tr_start, tr_end, blackboard::Easing::OutExpo);
@@ -114,8 +115,7 @@ void update()
           transform = anim.current_value();
           if (anim.completed)
           {
-              anim.set_easing(static_cast<Easing>((anim.get_easing() + 1) % Easing::Count));
-              anim.reset();
+              anim.reset(static_cast<Easing>((anim.get_easing() + 1) % Easing::Count));
           }
       });
 
