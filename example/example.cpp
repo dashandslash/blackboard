@@ -110,11 +110,10 @@ void update()
          components::Animation<components::Transform> &anim) {
           anim.tick(App::delta_time());
 
-          transform.set_transform(glm::interpolate(anim.start_value().get_transform(),
-                                                   anim.end_value().get_transform(), anim.curr_time()));
+          transform = anim.current_value();
           if (anim.completed)
           {
-              anim.set_easing(static_cast<Easing>(std::rand() % Easing::Count));
+              anim.set_easing(static_cast<Easing>((anim.get_easing() + 1) % Easing::Count));
               anim.reset();
           }
       });

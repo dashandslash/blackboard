@@ -1,5 +1,6 @@
 #pragma once
 #include <bx/easing.h>
+#include <glm/glm.hpp>
 
 namespace blackboard {
 
@@ -21,9 +22,20 @@ struct Animation
 
     decltype(auto) end_value() const { return m_end_value; }
 
-    float curr_time() const { return m_easing_fn(glm::clamp(m_curr_time / m_end_time, 0.0f, 1.0f)); }
+    float current_time() const
+    {
+        return m_easing_fn(glm::clamp(m_current_time / m_end_time, 0.0f, 1.0f));
+    }
 
-    void reset() { m_curr_time = 0.0f; }
+    const T &current_value() const
+    {
+        return m_current_value;
+    }
+
+    void reset()
+    {
+        m_current_time = 0.0f;
+    }
 
     void set_easing(const Easing &easing)
     {
@@ -31,11 +43,17 @@ struct Animation
         m_easing_fn = bx::getEaseFunc(easing);
     }
 
+    const Easing &get_easing() const
+    {
+        return m_easing;
+    }
+
     void tick(float delta)
     {
-        m_curr_time += delta;
+        m_current_time += delta;
+        update();
 
-        if (m_curr_time < m_end_time || !loop)
+        if (m_current_time < m_end_time || !loop)
         {
             completed = false;
             return;
@@ -55,10 +73,12 @@ struct Animation
     bool completed{false};
 
 private:
-    float m_curr_time{0.0f};
+    void update();
+    float m_current_time{0.0f};
     float m_end_time{0.0f};
     T m_start_value;
     T m_end_value;
+    T m_current_value;
     Easing m_easing{Easing::Linear};
     bx::EaseFn m_easing_fn{bx::easeLinear};
 };
