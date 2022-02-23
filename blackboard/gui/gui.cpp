@@ -1,11 +1,15 @@
 #include "gui.h"
 
+#include "gui/components.h"
 #include "meta/meta.h"
 #include "renderer/platform/imgui_impl_sdl_bgfx.h"
+#include "scene/components/transform.h"
+#include "state/state.h"
 
 #include <SDL/SDL.h>
 #include <bgfx/bgfx.h>
 #include <bgfx/platform.h>
+#include <glm/gtx/euler_angles.hpp>
 #include <imgui/backends/imgui_impl_sdl.h>
 #include <imgui/imgui_internal.h>
 
@@ -296,6 +300,69 @@ void dockspace()
     {
         reflection_inspector();
     }
+}
+
+void entities_window(State &state)
+{
+    ImGui::Begin("Entities Window", NULL);
+    static int editing{-1};
+    ImGui::BeginGroup();
+    ImGui::Text("Entities:");
+    const auto textlineH = ImGui::GetTextLineHeight();
+
+    ImGui::SameLine(ImGui::GetWindowWidth() - (textlineH * 1.5f));
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {0.0f, 0.0f});
+    if (ImGui::Button("+", {textlineH, textlineH}))
+    {
+        state.create_entity();
+    }
+    ImGui::PopStyleVar();
+
+    ImGui::PushStyleVar(ImGuiStyleVar_IndentSpacing, 0.0f);
+    static entt::entity selected{entt::null};
+    state.each([&](const auto e) {
+        const auto idStr = std::to_string(entt::to_integral(e));
+        ImGui::Bullet();
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(-1);
+        static int editing{-1};
+        if (ImGui::Selectable(idStr.c_str(), selected == e, ImGuiSelectableFlags_None))
+        {
+            selected = e;
+            ImGui::OpenPopup((char *)&selected);
+        }
+    });
+    ImGui::PopStyleVar();
+    ImGui::EndGroup();
+
+    if (selected != entt::null)
+    {
+        ImGui::SetNextWindowSize(
+          {ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y / 2.0f});
+        ImGui::Begin("Properties", nullptr, ImGuiWindowFlags_NoSavedSettings);
+        {
+            // Transform
+            show_component<components::Transform>(
+              state, selected, "Transform", [&](components::Transform &tr) {
+                  auto euler_degrees = glm::degrees(glm::eulerAngles(tr.rotation));
+                  auto modified = show_component_parameter("Translation", &vec3_control, tr.translation,
+                                                           0.0f, 150.0f);
+                  modified |=
+                    show_component_parameter("Rotation", &vec3_control, euler_degrees, 0.0f, 150.0f);
+                  modified |= show_component_parameter("Scale", &vec3_control, tr.scale, 1.0f, 150.0f);
+                  if (modified)
+                  {
+                      state.patch<components::Transform>(
+                        selected, [&euler_degrees](components::Transform &tr) {
+                            tr.rotation = glm::quat(glm::radians(euler_degrees));
+                        });
+                  };
+                  return modified;
+              });
+        }
+        ImGui::End();
+    }
+    ImGui::End();
 }
 
 ImTextureID toId(bgfx::TextureHandle _handle, uint8_t _flags, uint8_t _mip)

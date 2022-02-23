@@ -1,6 +1,7 @@
 #define SDL_MAIN_HANDLED
 
 #include <blackboard/app/app.h>
+#include <blackboard/gui/components.h>
 #include <blackboard/meta/meta.h>
 #include <blackboard/renderer/camera.h>
 #include <blackboard/renderer/layouts.h>
@@ -79,6 +80,8 @@ void render_ui()
     ImGui::SliderFloat("u_edge_thickness", &uniform.u_edge_thickness, 0.0f, 20.0f);
     ImGui::End();
 
+    gui::entities_window(state);
+
     ImGui::Begin("Viewport");
     ImVec2 size(ImGui::GetContentRegionAvail().x,
                 ImGui::GetContentRegionAvail().x / (1280.0f / 720.0f));
@@ -119,7 +122,7 @@ void update()
           }
       });
 
-    state.view<components::Transform>().each([](const auto, components::Transform transform) {
+    state.view<components::Transform>().each([](const auto, components::Transform &transform) {
         auto mtx = glm::value_ptr(transform.get_transform());
 
         bgfx::setVertexBuffer(0, vbh);

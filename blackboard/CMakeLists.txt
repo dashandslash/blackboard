@@ -4,6 +4,7 @@ project(blackboard_lib)
 
 set(SOURCES
     app/app.cpp
+    gui/components.cpp
     gui/gui.cpp
     platform/window.cpp
     meta/meta.cpp
@@ -18,6 +19,7 @@ set(SOURCES
 set(HEADERS 
     app/app.h
     app/resources.h
+    gui/components.h
     gui/gui.h
     platform/window.h
     meta/meta.h

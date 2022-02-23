@@ -9,7 +9,7 @@ namespace blackboard {
 State::State()
 {
     meta::register_component<components::Transform>("Transform");
-    meta::register_component<components::Animation<components::Transform>>("Animation_Transform");
+    meta::register_component<components::Animation<components::Transform>>("Animation<Transform>");
 }
 
 entt::entity State::create_entity()

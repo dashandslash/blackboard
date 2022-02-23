@@ -28,7 +28,7 @@ struct State
     template<typename Component, typename... Func>
     decltype(auto) patch(const entity_type entity, Func &&... func)
     {
-        return m_registry.patch(entity, std::forward<Func>(func)...);
+        return m_registry.patch<Component>(entity, std::forward<Func>(func)...);
     }
 
     template<typename Component, typename... Other, typename... Exclude>
@@ -43,6 +43,30 @@ struct State
     {
         return m_registry.view<Component, Other..., Exclude...>(
           std::forward<entt::exclude_t<Exclude...>>(exc));
+    }
+
+    template<typename... Args>
+    auto all_of(const entity_type entity)
+    {
+        return m_registry.all_of<Args...>(entity);
+    }
+
+    template<typename... Args>
+    decltype(auto) get(const entity_type entity)
+    {
+        return m_registry.get<Args...>(entity);
+    }
+
+    template<typename... Args>
+    decltype(auto) get(const entity_type entity) const
+    {
+        return m_registry.get<Args...>(entity);
+    }
+
+    template<typename Func>
+    void each(Func &&func) const
+    {
+        m_registry.each(std::forward<Func>(func));
     }
 
 private:
