@@ -3,7 +3,9 @@
 #include "gui/components.h"
 #include "meta/meta.h"
 #include "renderer/platform/imgui_impl_sdl_bgfx.h"
+#include "scene/components/name.h"
 #include "scene/components/transform.h"
+#include "scene/components/uuid.h"
 #include "state/state.h"
 
 #include <SDL/SDL.h>
@@ -12,6 +14,7 @@
 #include <glm/gtx/euler_angles.hpp>
 #include <imgui/backends/imgui_impl_sdl.h>
 #include <imgui/imgui_internal.h>
+#include <imgui/misc/cpp/imgui_stdlib.h>
 
 #include <iostream>
 
@@ -310,7 +313,7 @@ void entities_window(State &state)
     ImGui::Text("Entities:");
     const auto textlineH = ImGui::GetTextLineHeight();
 
-    ImGui::SameLine(ImGui::GetWindowWidth() - (textlineH * 1.5f));
+    ImGui::SameLine(ImGui::GetWindowWidth() - (textlineH * 2.0f));
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {0.0f, 0.0f});
     if (ImGui::Button("+", {textlineH, textlineH}))
     {
@@ -320,13 +323,13 @@ void entities_window(State &state)
 
     ImGui::PushStyleVar(ImGuiStyleVar_IndentSpacing, 0.0f);
     static entt::entity selected{entt::null};
-    state.each([&](const auto e) {
+    state.view<components::Name>().each([&](const auto e, const auto &name) {
         const auto idStr = std::to_string(entt::to_integral(e));
         ImGui::Bullet();
         ImGui::SameLine();
         ImGui::SetNextItemWidth(-1);
         static int editing{-1};
-        if (ImGui::Selectable(idStr.c_str(), selected == e, ImGuiSelectableFlags_None))
+        if (ImGui::Selectable(name.value.c_str(), selected == e, ImGuiSelectableFlags_None))
         {
             selected = e;
             ImGui::OpenPopup((char *)&selected);
@@ -339,8 +342,33 @@ void entities_window(State &state)
     {
         ImGui::SetNextWindowSize(
           {ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y / 2.0f});
-        ImGui::Begin("Properties", nullptr, ImGuiWindowFlags_NoSavedSettings);
+        ImGui::Begin("Properties", nullptr);
         {
+            // Uuid
+
+            show_component_parameter("Uuid", [&state]() {
+                ImGui::InputText("##uuid", state.get<components::Uuid>(selected).get().data(),
+                                 ImGuiInputTextFlags_ReadOnly);
+                return false;
+            });
+
+            // Name
+            show_component<components::Name>(
+              state, selected, "Name", [&state](components::Name &component) {
+                  auto temp_name = component.value;
+
+                  if (show_component_parameter("Name", [&state, &component, &temp_name]() {
+                          return ImGui::InputText("##name", &temp_name, ImGuiInputTextFlags_None);
+                      }))
+                  {
+                      state.patch<components::Name>(
+                        selected,
+                        [&state, &component, &temp_name](auto &name) { name.value = temp_name; });
+                      return true;
+                  }
+                  return false;
+              });
+
             // Transform
             show_component<components::Transform>(
               state, selected, "Transform", [&](components::Transform &tr) {

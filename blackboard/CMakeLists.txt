@@ -31,7 +31,9 @@ set(HEADERS
     renderer/renderer.h
     renderer/utils.h
     scene/components/animation.h
+    scene/components/name.h
     scene/components/transform.h
+    scene/components/uuid.h
     state/state.h
     utils/watchdog.h
 )

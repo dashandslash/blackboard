@@ -8,9 +8,9 @@
 
 namespace blackboard::gui {
 
-struct PushStyleCompact
+struct push_style_compact
 {
-    PushStyleCompact()
+    push_style_compact()
     {
         ImGuiStyle &style = ImGui::GetStyle();
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
@@ -18,7 +18,7 @@ struct PushStyleCompact
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
                             ImVec2(style.ItemSpacing.x, (float)(int)(style.ItemSpacing.y * 0.60f)));
     }
-    ~PushStyleCompact()
+    ~push_style_compact()
     {
         ImGui::PopStyleVar(2);
     }
@@ -31,11 +31,11 @@ static bool show_component_parameter(const std::string &label, UIFunction &&uiFu
 {
     bool modified{false};
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{0, 2});
-    if (ImGui::BeginTable("##table", 2))
+    static const auto flags =
+      ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
+    if (ImGui::BeginTable("##table", 2, flags))
     {
-        ImGui::TableSetupColumn("header1", ImGuiTableColumnFlags_WidthFixed,
-                                150.0f);    // Default to 100.0f
-        ImGui::SetNextItemWidth(150.0f);
+        ImGui::TableSetupColumn("header1", ImGuiTableColumnFlags_WidthFixed, 80.0f);
         ImGui::TableNextColumn();
         ImGui::Text("%s", label.c_str());
         ImGui::TableNextColumn();
@@ -54,24 +54,24 @@ template<typename T, typename UIFunction>
 static bool show_component(blackboard::State &state, const entt::entity entity,
                            const std::string &label, UIFunction uiFunction)
 {
-    PushStyleCompact compact;
+    push_style_compact compact;
     bool modified{false};
     if (state.all_of<T>(entity))
     {
         auto typeName = entt::type_name<T>::value();
         if (ImGui::CollapsingHeader(
               std::string{typeName.substr(typeName.find_last_of("::") + 1)}.c_str(),
-              ImGuiTreeNodeFlags_Framed))
+              ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_DefaultOpen))
         {
             const auto topLeft = ImGui::GetItemRectMin();
-            const auto topRight = ImVec2{ImGui::GetItemRectMax().x, topLeft.y};
+            const auto topRight = ImVec2{ImGui::GetItemRectMax().x - 1, topLeft.y};
             ImGui::BeginGroup();
 
             auto &component = state.get<T>(entity);
             modified = uiFunction(component);
 
             ImGui::EndGroup();
-            const auto bottomRight = ImVec2{topRight.x, ImGui::GetItemRectMax().y};
+            const auto bottomRight = ImVec2{topRight.x - 1, ImGui::GetItemRectMax().y};
             const auto bottomLeft = ImVec2{topLeft.x, bottomRight.y};
 
             const auto borderCol = ImGui::GetStyle().Colors[ImGuiCol_Border];
