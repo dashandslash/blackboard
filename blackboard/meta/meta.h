@@ -10,15 +10,17 @@
 
 namespace blackboard::meta {
 
-struct info
+struct Info
 {
-    const std::string type_name{};
     const std::string name{};
+    const entt::type_info type_info;
 };
+
+using Meta_infos = std::unordered_map<entt::id_type, Info>;
 
 namespace impl {
 inline constexpr auto name_hs = entt::hashed_string("name");
-inline std::vector<info> reflected_components_infos;
+inline Meta_infos meta_components_infos;
 }    // namespace impl
 
 template<typename T>
@@ -26,8 +28,9 @@ inline void register_component(std::string &&reflected_name)
 {
     using namespace entt::literals;
     using namespace impl;
+    const entt::type_info type_info = entt::type_id<T>();
 
-    if (entt::resolve(entt::type_id<T>()))
+    if (meta_components_infos.contains(type_info.hash()))
     {
         return;
     }
@@ -37,12 +40,12 @@ inline void register_component(std::string &&reflected_name)
 
     if (auto prop = meta_type.prop(name_hs); prop)
     {
-        reflected_components_infos.emplace_back(
-          info{.type_name = std::string{meta_type.info().name()},
-               .name = prop.value().template cast<std::string>()});
+        meta_components_infos.insert({type_info.hash(),
+                                      {.name = prop.value().template cast<std::string>(),
+                                       .type_info = type_info}});
     }
 }
 
-const std::vector<info> &get_reflected_components_infos();
+const Meta_infos &get_reflected_components_infos();
 
 }    // namespace blackboard::meta

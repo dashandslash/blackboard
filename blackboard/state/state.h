@@ -70,7 +70,7 @@ struct State
         m_registry.each(std::forward<Func>(func));
     }
 
-private:
+    //private:
     entt::registry m_registry;
 };
 

@@ -58,24 +58,10 @@ static bool draw_component(blackboard::State &state, const entt::entity entity,
     push_style_compact compact;
 
     static auto fn = [&state, &entity, &ui_function]() -> bool {
-        const auto topLeft = ImGui::GetItemRectMin();
-        const auto topRight = ImVec2{ImGui::GetItemRectMax().x - 1, topLeft.y};
         ImGui::BeginGroup();
-
         auto &component = state.get<T>(entity);
         bool modified = ui_function(component);
-
         ImGui::EndGroup();
-        const auto bottomRight = ImVec2{topRight.x - 1, ImGui::GetItemRectMax().y};
-        const auto bottomLeft = ImVec2{topLeft.x, bottomRight.y};
-
-        const auto borderCol = ImGui::GetStyle().Colors[ImGuiCol_Border];
-        const auto borderColInt =
-          IM_COL32(borderCol.x * 255, borderCol.y * 255, borderCol.z * 255, borderCol.w * 255);
-        auto &dl = *ImGui::GetWindowDrawList();
-        dl.AddLine(topLeft, bottomLeft, borderColInt);
-        dl.AddLine(bottomLeft, bottomRight, borderColInt);
-        dl.AddLine(topRight, bottomRight, borderColInt);
         return modified;
     };
 

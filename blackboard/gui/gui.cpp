@@ -3,6 +3,7 @@
 #include "gui/components.h"
 #include "meta/meta.h"
 #include "renderer/platform/imgui_impl_sdl_bgfx.h"
+#include "scene/components/animation.h"
 #include "scene/components/name.h"
 #include "scene/components/transform.h"
 #include "scene/components/uuid.h"
@@ -11,6 +12,7 @@
 #include <SDL/SDL.h>
 #include <bgfx/bgfx.h>
 #include <bgfx/platform.h>
+#include <entt/entity/runtime_view.hpp>
 #include <glm/gtx/euler_angles.hpp>
 #include <imgui/backends/imgui_impl_sdl.h>
 #include <imgui/imgui_internal.h>
@@ -169,25 +171,45 @@ void load_font(const std::filesystem::path &path, const float size, const bool s
 void reflection_inspector()
 {
     ImGui::Begin("Reflection inspector");
-    if (ImGui::CollapsingHeader("Components"))
+
+    if (ImGui::CollapsingHeader("Components",
+                                ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_DefaultOpen))
     {
         static const auto flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable |
                                   ImGuiTableFlags_Hideable | ImGuiTableFlags_Sortable |
                                   ImGuiTableFlags_SortMulti;
 
-        if (ImGui::BeginTable("Reflection_table", 2, flags))
+        const auto &states = blackboard::get_states();
+        const int num_cols = 3 + states.size();
+
+        if (ImGui::BeginTable("Reflection_table", num_cols, flags))
         {
+            ImGui::TableSetupColumn("Id", ImGuiTableColumnFlags_DefaultSort);
             ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_DefaultSort);
-            ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_NoSort);
+            ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_DefaultSort);
+            for (const auto &[state_name, _] : states)
+            {
+                const auto title = "State " + state_name + " count";
+                ImGui::TableSetupColumn(title.data(), ImGuiTableColumnFlags_DefaultSort);
+            }
             ImGui::TableHeadersRow();
 
-            for (const auto &entry : meta::get_reflected_components_infos())
+            for (const auto &[type_index, info] : meta::get_reflected_components_infos())
             {
                 ImGui::TableNextRow();
                 ImGui::TableNextColumn();
-                ImGui::Text("%s", entry.name.data());
+                ImGui::Text("%s", std::to_string(entt::to_integral(type_index)).data());
                 ImGui::TableNextColumn();
-                ImGui::Text("%s", entry.type_name.data());
+                ImGui::Text("%s", info.name.data());
+                ImGui::TableNextColumn();
+                ImGui::Text("%s", info.type_info.name().data());
+
+                for (const auto &[state_name, state] : states)
+                {
+                    ImGui::TableNextColumn();
+                    ImGui::Text(
+                      "%s", std::to_string(state.m_registry.storage(type_index)->second.size()).data());
+                }
             }
             ImGui::EndTable();
         }
@@ -345,20 +367,25 @@ void entities_window(State &state)
         ImGui::Begin("Properties", nullptr);
         {
             // Uuid
-
-            show_component_parameter("Uuid", [&state]() {
-                ImGui::InputText("##uuid", state.get<components::Uuid>(selected).get().data(),
-                                 ImGuiInputTextFlags_ReadOnly);
-                return false;
-            });
+            draw_component<components::Uuid>(
+              state, selected, "Uuid",
+              [&state](const auto &component) {
+                  return draw_component_parameter("Uuid", [&state]() {
+                      return ImGui::InputText("##uuid",
+                                              state.get<components::Uuid>(selected).get().data(),
+                                              ImGuiInputTextFlags_ReadOnly);
+                  });
+              },
+              false);
 
             // Name
-            show_component<components::Name>(
+            draw_component<components::Name>(
               state, selected, "Name", [&state](components::Name &component) {
                   auto temp_name = component.value;
 
-                  if (show_component_parameter("Name", [&state, &component, &temp_name]() {
-                          return ImGui::InputText("##name", &temp_name, ImGuiInputTextFlags_None);
+                  if (draw_component_parameter("Name", [&state, &component, &temp_name]() {
+                          return ImGui::InputText("##name", &temp_name,
+                                                  ImGuiInputTextFlags_EnterReturnsTrue);
                       }))
                   {
                       state.patch<components::Name>(
@@ -370,14 +397,14 @@ void entities_window(State &state)
               });
 
             // Transform
-            show_component<components::Transform>(
+            draw_component<components::Transform>(
               state, selected, "Transform", [&](components::Transform &tr) {
                   auto euler_degrees = glm::degrees(glm::eulerAngles(tr.rotation));
-                  auto modified = show_component_parameter("Translation", &vec3_control, tr.translation,
+                  auto modified = draw_component_parameter("Translation", &vec3_control, tr.translation,
                                                            0.0f, 150.0f);
                   modified |=
-                    show_component_parameter("Rotation", &vec3_control, euler_degrees, 0.0f, 150.0f);
-                  modified |= show_component_parameter("Scale", &vec3_control, tr.scale, 1.0f, 150.0f);
+                    draw_component_parameter("Rotation", &vec3_control, euler_degrees, 0.0f, 150.0f);
+                  modified |= draw_component_parameter("Scale", &vec3_control, tr.scale, 1.0f, 150.0f);
                   if (modified)
                   {
                       state.patch<components::Transform>(
