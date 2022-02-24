@@ -11,6 +11,7 @@
 struct SDL_Window;
 
 namespace blackboard {
+
 struct State
 {
     State();
@@ -72,4 +73,9 @@ struct State
 private:
     entt::registry m_registry;
 };
+
+State &create_state(const std::string &state_name);
+State &get_state(const std::string &state_name);
+std::unordered_map<std::string, State> &get_states();
+
 }    // namespace blackboard

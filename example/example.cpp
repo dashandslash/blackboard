@@ -30,7 +30,8 @@ bgfx::FrameBufferHandle frameBufferHandle = BGFX_INVALID_HANDLE;
 renderer::material::Uniform uniform = {.u_color = {1.0, 1.0, 1.0, 1.0},
                                        .u_edge_color{0.0f, 0.0f, 0.0f, 1.0f},
                                        .u_edge_thickness = 3.5f};
-State state;
+
+static const std::string state_name{"default_state"};
 
 void init()
 {
@@ -56,6 +57,8 @@ void init()
 
     ImGui::LoadIniSettingsFromDisk(imgui_ini_path.c_str());
 
+    auto &state = blackboard::create_state(state_name);
+
     auto e = state.create_entity();
     auto &tr_start = state.emplace_component<components::Transform>(e);
     tr_start.translation = {-5.0f, 0.0f, 0.0f};
@@ -79,6 +82,8 @@ void render_ui()
     ImGui::ColorEdit4("u_edge_color", uniform.u_edge_color.data());
     ImGui::SliderFloat("u_edge_thickness", &uniform.u_edge_thickness, 0.0f, 20.0f);
     ImGui::End();
+
+    auto &state = blackboard::get_state(state_name);
 
     gui::entities_window(state);
 
@@ -109,6 +114,8 @@ void update()
 
     uniform.u_camera_position = {cam.getEyePoint().x, cam.getEyePoint().y, cam.getEyePoint().z};
     uniform.u_time = App::elapsed_time();
+
+    auto &state = blackboard::get_state(state_name);
 
     state.view<components::Transform, components::Animation<components::Transform>>().each(
       [](const auto, components::Transform &transform,
