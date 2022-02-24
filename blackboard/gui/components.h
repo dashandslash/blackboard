@@ -27,7 +27,7 @@ struct push_style_compact
 bool vec3_control(glm::vec3 &&values, const float resetValue = 0.0f, const float columnWidth = 150.0f);
 
 template<typename UIFunction, typename... Args>
-static bool show_component_parameter(const std::string &label, UIFunction &&uiFunction, Args &&... args)
+static bool draw_component_parameter(const std::string &label, UIFunction &&uiFunction, Args &&... args)
 {
     bool modified{false};
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{0, 2});
@@ -51,39 +51,51 @@ static bool show_component_parameter(const std::string &label, UIFunction &&uiFu
 }
 
 template<typename T, typename UIFunction>
-static bool show_component(blackboard::State &state, const entt::entity entity,
-                           const std::string &label, UIFunction uiFunction)
+static bool draw_component(blackboard::State &state, const entt::entity entity,
+                           const std::string &label, UIFunction ui_function,
+                           const bool with_header = true)
 {
     push_style_compact compact;
-    bool modified{false};
+
+    static auto fn = [&state, &entity, &ui_function]() -> bool {
+        const auto topLeft = ImGui::GetItemRectMin();
+        const auto topRight = ImVec2{ImGui::GetItemRectMax().x - 1, topLeft.y};
+        ImGui::BeginGroup();
+
+        auto &component = state.get<T>(entity);
+        bool modified = ui_function(component);
+
+        ImGui::EndGroup();
+        const auto bottomRight = ImVec2{topRight.x - 1, ImGui::GetItemRectMax().y};
+        const auto bottomLeft = ImVec2{topLeft.x, bottomRight.y};
+
+        const auto borderCol = ImGui::GetStyle().Colors[ImGuiCol_Border];
+        const auto borderColInt =
+          IM_COL32(borderCol.x * 255, borderCol.y * 255, borderCol.z * 255, borderCol.w * 255);
+        auto &dl = *ImGui::GetWindowDrawList();
+        dl.AddLine(topLeft, bottomLeft, borderColInt);
+        dl.AddLine(bottomLeft, bottomRight, borderColInt);
+        dl.AddLine(topRight, bottomRight, borderColInt);
+        return modified;
+    };
+
     if (state.all_of<T>(entity))
     {
         auto typeName = entt::type_name<T>::value();
+
+        if (!with_header)
+        {
+            return fn();
+        }
+
         if (ImGui::CollapsingHeader(
               std::string{typeName.substr(typeName.find_last_of("::") + 1)}.c_str(),
               ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_DefaultOpen))
         {
-            const auto topLeft = ImGui::GetItemRectMin();
-            const auto topRight = ImVec2{ImGui::GetItemRectMax().x - 1, topLeft.y};
-            ImGui::BeginGroup();
-
-            auto &component = state.get<T>(entity);
-            modified = uiFunction(component);
-
-            ImGui::EndGroup();
-            const auto bottomRight = ImVec2{topRight.x - 1, ImGui::GetItemRectMax().y};
-            const auto bottomLeft = ImVec2{topLeft.x, bottomRight.y};
-
-            const auto borderCol = ImGui::GetStyle().Colors[ImGuiCol_Border];
-            const auto borderColInt =
-              IM_COL32(borderCol.x * 255, borderCol.y * 255, borderCol.z * 255, borderCol.w * 255);
-            auto &dl = *ImGui::GetWindowDrawList();
-            dl.AddLine(topLeft, bottomLeft, borderColInt);
-            dl.AddLine(bottomLeft, bottomRight, borderColInt);
-            dl.AddLine(topRight, bottomRight, borderColInt);
+            return fn();
         }
     }
-    return modified;
+    return false;
 }
 
 }    // namespace blackboard::gui
