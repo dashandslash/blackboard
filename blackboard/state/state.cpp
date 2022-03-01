@@ -13,7 +13,7 @@ std::unordered_map<std::string, State> states;
 State::State()
 {
     meta::register_component<components::Transform>("Transform");
-    meta::register_component<components::Animation<components::Transform>>("Animation<Transform>");
+    meta::register_component<components::Animation>("Animation");
     meta::register_component<components::Uuid>("Uuid");
     meta::register_component<components::Name>("Name");
 }
