@@ -1,5 +1,6 @@
 #pragma once
 #include <bx/easing.h>
+#include <entt/entt.hpp>
 #include <glm/glm.hpp>
 
 #include <algorithm>
