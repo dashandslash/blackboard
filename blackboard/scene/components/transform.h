@@ -24,7 +24,7 @@ struct Transform
 
     glm::mat4 get_transform() const
     {
-        return glm::translate(glm::mat4(1.0f), translation) * glm::toMat4(rotation) *
+        return glm::translate(glm::mat4(1.0f), translation) * glm::mat4(rotation) *
                glm::scale(glm::mat4(1.0f), scale);
     }
 

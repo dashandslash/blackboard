@@ -6,7 +6,8 @@
 
 namespace blackboard::gui {
 
-bool vec3_control(glm::vec3 &&values, const float resetValue, const float columnWidth)
+bool vec3_control(glm::vec3 &&values, const float resetValue, const float min, const float max,
+                  const float columnWidth)
 {
     bool modified{false};
     float lineHeight{ImGui::GetTextLineHeight()};
@@ -22,7 +23,7 @@ bool vec3_control(glm::vec3 &&values, const float resetValue, const float column
     ImGui::PopStyleColor(3);
     ImGui::SameLine();
     ImGui::SetNextItemWidth((ImGui::GetContentRegionAvail().x - buttonSize.x * 2.0f) / 3.0f);
-    if (ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f"))
+    if (ImGui::DragFloat("##X", &values.x, 0.1f, min, max, "%.2f"))
     {
         modified = true;
     }
@@ -38,7 +39,7 @@ bool vec3_control(glm::vec3 &&values, const float resetValue, const float column
     ImGui::PopStyleColor(3);
     ImGui::SameLine();
     ImGui::SetNextItemWidth((ImGui::GetContentRegionAvail().x - buttonSize.x) / 2.0f);
-    if (ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f"))
+    if (ImGui::DragFloat("##Y", &values.y, 0.1f, min, max, "%.2f"))
     {
         modified = true;
     }
@@ -54,7 +55,7 @@ bool vec3_control(glm::vec3 &&values, const float resetValue, const float column
     ImGui::PopStyleColor(3);
     ImGui::SameLine();
     ImGui::SetNextItemWidth((ImGui::GetContentRegionAvail().x));
-    if (ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f"))
+    if (ImGui::DragFloat("##Z", &values.z, 0.1f, min, max, "%.2f"))
     {
         modified = true;
     }

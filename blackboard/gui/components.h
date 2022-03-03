@@ -24,7 +24,8 @@ struct push_style_compact
     }
 };
 
-bool vec3_control(glm::vec3 &&values, const float resetValue = 0.0f, const float columnWidth = 150.0f);
+bool vec3_control(glm::vec3 &&values, const float resetValue = 0.0f, const float min = 0.0f,
+                  const float max = 0.0f, const float columnWidth = 150.0f);
 
 template<typename UIFunction, typename... Args>
 static bool draw_component_parameter(const std::string &label, UIFunction &&uiFunction, Args &&... args)
@@ -52,14 +53,14 @@ static bool draw_component_parameter(const std::string &label, UIFunction &&uiFu
 
 template<typename T, typename UIFunction>
 static bool draw_component(blackboard::State &state, const entt::entity entity,
-                           const std::string &label, UIFunction ui_function,
+                           const std::string &label, UIFunction &&ui_function,
                            const bool with_header = true)
 {
     push_style_compact compact;
 
-    static auto fn = [&state, &entity, &ui_function]() -> bool {
+    auto fn = [&state, &entity, &ui_function]() -> bool {
         ImGui::BeginGroup();
-        auto &component = state.get<T>(entity);
+        T &component = state.get<T>(entity);
         bool modified = ui_function(component);
         ImGui::EndGroup();
         return modified;
@@ -67,16 +68,13 @@ static bool draw_component(blackboard::State &state, const entt::entity entity,
 
     if (state.all_of<T>(entity))
     {
-        auto typeName = entt::type_name<T>::value();
-
         if (!with_header)
         {
             return fn();
         }
 
-        if (ImGui::CollapsingHeader(
-              std::string{typeName.substr(typeName.find_last_of("::") + 1)}.c_str(),
-              ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_DefaultOpen))
+        if (ImGui::CollapsingHeader(label.c_str(),
+                                    ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_DefaultOpen))
         {
             return fn();
         }

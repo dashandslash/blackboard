@@ -364,9 +364,9 @@ void entities_window(State &state)
     {
         ImGui::SetNextWindowSize(
           {ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y / 2.0f});
-        ImGui::Begin("Properties", nullptr);
+        ImGui::Begin("Properties");
         {
-            // Uuid
+            // UUID
             draw_component<components::Uuid>(
               state, selected, "Uuid",
               [&state](const auto &component) {
@@ -396,24 +396,58 @@ void entities_window(State &state)
                   return false;
               });
 
+            auto draw_transform_fn = [&](components::Transform &tr) -> bool {
+                auto vec3_rotation = glm::degrees(glm::eulerAngles(tr.rotation));
+                auto modified = draw_component_parameter("Translation", &vec3_control, tr.translation,
+                                                         0.0f, -180.0f, 180.0f, 150.0f);
+                modified |= draw_component_parameter("Rotation", &vec3_control, vec3_rotation, 0.0f,
+                                                     -180.0f, 180.0f, 150.0f);
+                modified |= draw_component_parameter("Scale", &vec3_control, tr.scale, 1.0f, -180.0f,
+                                                     180.0f, 150.0f);
+                return modified;
+            };
+
             // Transform
-            draw_component<components::Transform>(
-              state, selected, "Transform", [&](components::Transform &tr) {
-                  auto euler_degrees = glm::degrees(glm::eulerAngles(tr.rotation));
-                  auto modified = draw_component_parameter("Translation", &vec3_control, tr.translation,
-                                                           0.0f, 150.0f);
-                  modified |=
-                    draw_component_parameter("Rotation", &vec3_control, euler_degrees, 0.0f, 150.0f);
-                  modified |= draw_component_parameter("Scale", &vec3_control, tr.scale, 1.0f, 150.0f);
-                  if (modified)
-                  {
-                      state.patch<components::Transform>(
-                        selected, [&euler_degrees](components::Transform &tr) {
-                            tr.rotation = glm::quat(glm::radians(euler_degrees));
-                        });
-                  };
-                  return modified;
-              });
+            draw_component<components::Transform>(state, selected, "Transform", draw_transform_fn);
+
+            //             Animation
+            ImGui::PushID("Animation_tr");
+            //            draw_component<components::Animation<components::Transform>>(
+            //              state, selected, "Animation", [&state, &draw_transform_fn](components::Animation<components::Transform> &anim) {
+            //
+            //                  draw_component_parameter("Current time:", [&](){
+            //                      ImGui::Text("%s", std::to_string(anim.current_time()).data());
+            //                      return false;
+            //                  });
+            //                  bool modified{false};
+            //                  ImGui::Checkbox("Active", &anim.active);
+            //                  ImGui::Checkbox("Loop", &anim.loop);
+            //                  ImGui::Checkbox("Ping-pong", &anim.ping_pong);
+            //                  if(ImGui::Button("Reset"))
+            //                  {
+            //                      anim.reset();
+            //                      modified = true;
+            //                  }
+            //                  ImGui::Separator();
+            //                  ImGui::Text("Start Value:");
+            //                  modified = draw_transform_fn(anim.start_value());
+            ////                  if (modified)
+            ////                  {
+            ////                      state.patch<components::Animation<components::Transform>>(
+            ////                        selected, [&euler_degrees](auto &anim) {
+            ////                            anim.start_value().rotation = glm::quat(glm::radians(euler_degrees));
+            ////                        });
+            ////                  };
+            //
+            //                  ImGui::Separator();
+            //                  ImGui::Text("End Value:");
+            //                  modified |= draw_transform_fn(anim.end_value());
+            //                  ImGui::Separator();
+            //
+            //
+            //                  return modified;
+            //              });
+            ImGui::PopID();
         }
         ImGui::End();
     }

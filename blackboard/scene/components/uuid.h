@@ -1,7 +1,9 @@
 #pragma once
 
 #ifdef _WIN32
+#include "Rpc.h"
 #include <windows.h>
+#pragma comment(lib, "Rpcrt4.lib")
 #elif __APPLE__
 #include <uuid/uuid.h>
 #endif
