@@ -1,6 +1,7 @@
 #define SDL_MAIN_HANDLED
 
 #include <blackboard/app/app.h>
+#include <blackboard/factories/factories.h>
 #include <blackboard/gui/components.h>
 #include <blackboard/meta/meta.h>
 #include <blackboard/renderer/camera.h>
@@ -62,16 +63,15 @@ void init()
     auto e = state.create_entity();
     auto &tr_start = state.emplace_component<components::Transform>(e);
     tr_start.translation = {-5.0f, 0.0f, 0.0f};
-    tr_start.rotation = glm::quat({-350.0f, -0.0f, -359.0f});
+    tr_start.rotation = glm::quat(glm::radians(glm::vec3{-0, -0.0f, -180.0f}));
     auto tr_end = components::Transform();
-    tr_end.rotation = glm::quat({350.0f, 0.0f, 359.0f});
+    tr_end.rotation = glm::quat(glm::radians(glm::vec3{120, -0.0f, 180.0f}));
     tr_end.translation = glm::vec3{5.0f, 0.0f, 0.0f};
     tr_end.scale = glm::vec3{.10f, 0.10f, 0.10f};
 
-    auto &anim_comp = state.emplace_component<components::Animation<components::Transform>>(
-      e, 3000.0f, tr_start, tr_end, blackboard::Easing::OutExpo);
-    anim_comp.ping_pong = true;
-    anim_comp.loop = true;
+    factories::create_animation(
+      state, e, std::move(tr_start), std::move(tr_end),
+      std::move(components::Animation::Info{.start_time = 1000.0f, .end_time = 2000.0, .loop = true}));
 }
 
 void render_ui()
@@ -101,7 +101,7 @@ void render_ui()
     ImGui::End();
 }
 
-void update()
+void app_update()
 {
     cam.setEyePoint({0.0, 0.0, -12.0f});
     cam.setPerspective(40.0f, 1280.0f / 720.0f, 0.1f, 1000.0f);
@@ -117,17 +117,8 @@ void update()
 
     auto &state = blackboard::get_state(state_name);
 
-    state.view<components::Transform, components::Animation<components::Transform>>().each(
-      [](const auto, components::Transform &transform,
-         components::Animation<components::Transform> &anim) {
-          anim.tick(App::delta_time());
-
-          transform = anim.current_value();
-          if (anim.completed)
-          {
-              anim.reset(static_cast<Easing>((anim.get_easing() + 1) % Easing::Count));
-          }
-      });
+    state.view<components::Animation>().each(
+      [](const auto, components::Animation &anim) { anim.update(App::delta_time()); });
 
     state.view<components::Transform>().each([](const auto, components::Transform &transform) {
         auto mtx = glm::value_ptr(transform.get_transform());
@@ -175,7 +166,7 @@ int main(int argc, char *argv[])
     else
     {
         App app("Example SDL", blackboard::renderer::Api::count);    // autodetect renderer api
-        app.on_update = update;
+        app.on_update = app_update;
         app.on_resize = resize;
         app.on_init = init;
         app.run();
