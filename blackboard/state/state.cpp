@@ -6,9 +6,11 @@
 #include "scene/components/transform.h"
 #include "scene/components/uuid.h"
 
+#include <entt/entt.hpp>
+
 namespace blackboard {
 
-std::unordered_map<std::string, State> states;
+entt::dense_map<std::string, State> states;
 
 State::State()
 {
@@ -43,7 +45,7 @@ State &get_state(const std::string &state_name)
     return states[state_name];
 }
 
-std::unordered_map<std::string, State> &get_states()
+entt::dense_map<std::string, State> &get_states()
 {
     return states;
 }

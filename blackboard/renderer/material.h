@@ -5,6 +5,7 @@
 #include <utils/watchdog.h>
 
 #include <bgfx/bgfx.h>
+#include <entt/container/dense_map.hpp>
 #include <glm/ext.hpp>
 #include <glm/glm.hpp>
 
@@ -161,7 +162,7 @@ struct Manager
         bgfx::setUniform(m_uniform_handle, uniform, num);
     }
 
-    std::unordered_map<size_t, MaterialType> materials;
+    entt::dense_map<size_t, MaterialType> materials;
 
 private:
     bgfx::UniformHandle m_uniform_handle = BGFX_INVALID_HANDLE;

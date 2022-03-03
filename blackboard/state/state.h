@@ -1,9 +1,6 @@
 #pragma once
-#include <entt/core/hashed_string.hpp>
-#include <entt/entt.hpp>
-#include <entt/meta/factory.hpp>
-#include <entt/meta/meta.hpp>
-#include <entt/meta/resolve.hpp>
+#include <entt/container/fwd.hpp>
+#include <entt/entity/registry.hpp>
 
 #include <iostream>
 #include <string>
@@ -76,6 +73,6 @@ struct State
 
 State &create_state(const std::string &state_name);
 State &get_state(const std::string &state_name);
-std::unordered_map<std::string, State> &get_states();
+entt::dense_map<std::string, State> &get_states();
 
 }    // namespace blackboard
