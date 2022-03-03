@@ -18,7 +18,7 @@ struct State
 
     using entity_type = entt::registry::entity_type;
 
-    entt::entity create_entity();
+    entt::entity create_entity(std::string &&name = "");
 
     template<typename Component, typename... Args>
     decltype(auto) emplace_component(const entity_type entity, Args &&... args)

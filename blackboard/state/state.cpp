@@ -18,11 +18,15 @@ State::State()
     meta::register_component<components::Name>("Name");
 }
 
-entt::entity State::create_entity()
+entt::entity State::create_entity(std::string &&name)
 {
     const auto entity = m_registry.create();
     m_registry.emplace<components::Uuid>(entity);
-    m_registry.emplace<components::Name>(entity, "Name_" + std::to_string(entt::to_integral(entity)));
+    if (name.empty())
+    {
+        name = "Name_" + std::to_string(entt::to_integral(entity));
+    }
+    m_registry.emplace<components::Name>(entity, name);
     return entity;
 }
 
