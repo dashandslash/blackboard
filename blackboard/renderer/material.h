@@ -5,7 +5,7 @@
 #include <utils/watchdog.h>
 
 #include <bgfx/bgfx.h>
-#include <entt/container/dense_map.hpp>
+#include <entt/core/type_info.hpp>
 #include <glm/ext.hpp>
 #include <glm/glm.hpp>
 
@@ -37,6 +37,20 @@ struct Uniform
 
 struct Material
 {
+    struct Material_concept
+    {
+        virtual std::unique_ptr<Material_concept> clone() const = 0;
+    };
+
+    template<typename T>
+    struct Material_model : public Material_concept
+    {
+        virtual std::unique_ptr<Material_concept> clone() const override
+        {
+            return std::make_unique<Material_concept>(*this);
+        }
+    };
+
     Material(const std::filesystem::path &vert_shader, const std::filesystem::path &frag_shader)
         : m_vert_path(vert_shader), m_frag_path(frag_shader)
     {
@@ -70,6 +84,9 @@ struct Material
     std::filesystem::path m_vert_path;
     std::filesystem::path m_frag_path;
     std::mutex mutex;
+
+private:
+    std::unique_ptr<Material_concept> p_impl;
 };
 
 struct UniformColor : public Material
@@ -77,35 +94,33 @@ struct UniformColor : public Material
     inline static std::string vert_path{"shaders/uniform_color/uniform_color.vert"};
     inline static std::string frag_path{"shaders/uniform_color/uniform_color.frag"};
     UniformColor()
-        : Material(blackboard::resources::path() / vert_path, blackboard::resources::path() / frag_path)
+        : Material(blackboard::resources::path() / "shaders/uniform_color/uniform_color.vert",
+                   blackboard::resources::path() / "shaders/uniform_color/uniform_color.frag")
     {}
 
     ~UniformColor() = default;
 };
 
-using UniformColorRef = std::shared_ptr<UniformColor>;
-using MaterialType = std::variant<UniformColorRef>;
+using MaterialType = std::shared_ptr<Material>;
+inline std::unordered_map<entt::id_type, MaterialType> materials;
 
 struct Manager
 {
     Manager()
     {
-        materials.try_emplace(typeid(UniformColor).hash_code(), std::make_shared<UniformColor>());
-        for (auto &[key, material] : materials)
+        materials.insert({entt::type_id<UniformColor>().hash(), std::make_shared<UniformColor>()});
+
+        for (auto &entry : materials)
         {
-            std::visit(
-              [&, key = key](const auto &m) {
-                  const auto &[vert_shader, frag_shader] = m->paths();
-                  const auto callback_multi = [&m](const std::vector<std::filesystem::path> &path) {
-                      m->init();
-                  };
-                  const auto callback = [&m](const std::filesystem::path &path) { m->init(); };
-                  utils::wd::watch(vert_shader, callback);
-                  utils::wd::watch(frag_shader, callback);
-                  utils::wd::watchMany(vert_shader, callback_multi);
-                  utils::wd::watchMany(frag_shader, callback_multi);
-              },
-              material);
+            const auto &[vert_shader, frag_shader] = entry.second->paths();
+            const auto callback_multi = [&entry](const std::vector<std::filesystem::path> &path) {
+                entry.second->init();
+            };
+            const auto callback = [&entry](const std::filesystem::path &path) { entry.second->init(); };
+            utils::wd::watch(vert_shader, callback);
+            utils::wd::watch(frag_shader, callback);
+            utils::wd::watchMany(vert_shader, callback_multi);
+            utils::wd::watchMany(frag_shader, callback_multi);
         }
     }
 
@@ -118,13 +133,9 @@ struct Manager
     {
         for (const auto &[name, material] : materials)
         {
-            std::visit(
-              [&](auto &&m) {
-                  const auto &[vert_shader, frag_shader] = m->paths();
-                  utils::wd::unwatch(vert_shader);
-                  utils::wd::unwatch(frag_shader);
-              },
-              material);
+            const auto &[vert_shader, frag_shader] = material->paths();
+            utils::wd::unwatch(vert_shader);
+            utils::wd::unwatch(frag_shader);
         }
         utils::wd::unwatchAll();
 
@@ -134,12 +145,8 @@ struct Manager
     template<typename T>
     inline decltype(auto) material() const
     {
-        assert(materials.contains(typeid(T).hash_code()));
-        return std::visit(
-          overloaded{
-            [&](const MaterialType &mat) { return std::get<std::shared_ptr<T>>(mat); },
-          },
-          materials.at(typeid(T).hash_code()));
+        assert(materials.contains(entt::type_id<T>().hash()));
+        return materials.at(entt::type_id<T>().hash());
     }
 
     void set_uniform(bgfx::Encoder *encoder, Uniform *uniform)
@@ -161,8 +168,6 @@ struct Manager
         }
         bgfx::setUniform(m_uniform_handle, uniform, num);
     }
-
-    entt::dense_map<size_t, MaterialType> materials;
 
 private:
     bgfx::UniformHandle m_uniform_handle = BGFX_INVALID_HANDLE;
