@@ -1,10 +1,6 @@
 #pragma once
 
-#ifdef _WIN32
-// todo!
-#elif __APPLE__
-#include <uuid/uuid.h>
-#endif
+#include <string>
 
 namespace blackboard::components {
 

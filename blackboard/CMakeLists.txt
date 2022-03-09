@@ -7,6 +7,7 @@ set(SOURCES
     factories/factories.cpp
     gui/components.cpp
     gui/gui.cpp
+    gui/sequencer.cpp
     platform/window.cpp
     meta/meta.cpp
     renderer/camera.cpp
@@ -23,6 +24,7 @@ set(HEADERS
     factories/factories.h
     gui/components.h
     gui/gui.h
+    gui/sequencer.h
     platform/window.h
     meta/meta.h
     renderer/platform/imgui_impl_sdl_bgfx.h

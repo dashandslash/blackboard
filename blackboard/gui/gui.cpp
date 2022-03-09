@@ -1,6 +1,7 @@
 #include "gui.h"
 
 #include "gui/components.h"
+#include "gui/sequencer.h"
 #include "meta/meta.h"
 #include "renderer/platform/imgui_impl_sdl_bgfx.h"
 #include "scene/components/animation.h"
@@ -222,6 +223,7 @@ void dockspace()
     static bool opt_fullscreen{true};
     static bool opt_padding{false};
     static bool show_demo_window{false};
+    static bool show_sequencer_window{false};
     static bool show_reflection_inspector{false};
 
     static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
@@ -308,6 +310,7 @@ void dockspace()
         if (ImGui::BeginMenu("Tools"))
         {
             ImGui::MenuItem("Show reflection inspector", NULL, &show_reflection_inspector);
+            ImGui::MenuItem("Show Sequencer window", NULL, &show_sequencer_window);
             ImGui::MenuItem("Show ImGui demo window", NULL, &show_demo_window);
             ImGui::EndMenu();
         }
@@ -324,6 +327,12 @@ void dockspace()
     if (show_reflection_inspector)
     {
         reflection_inspector();
+    }
+
+    if (show_sequencer_window)
+    {
+        static Sequencer sequencer;
+        sequencer.draw();
     }
 }
 

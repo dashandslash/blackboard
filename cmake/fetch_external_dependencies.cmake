@@ -32,6 +32,15 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(imgui)
 
+FetchContent_Declare(
+                     imguizmo
+                     GIT_REPOSITORY https://github.com/CedricGuillemet/ImGuizmo.git
+                     GIT_TAG master
+                     GIT_SHALLOW 1
+)
+FetchContent_MakeAvailable(imguizmo)
+
+
 # FetchContent_Declare(
 #                      imgui_color_text_edit
 #                      GIT_REPOSITORY https://github.com/BalazsJako/ImGuiColorTextEdit.git
@@ -48,7 +57,18 @@ execute_process(
     COMMAND ${CMAKE_COMMAND} -E create_symlink ${imgui_SOURCE_DIR} ${FETCHCONTENT_BASE_DIR}/imgui
 )
 
+execute_process(
+    COMMAND ${CMAKE_COMMAND} -E create_symlink ${imguizmo_SOURCE_DIR} ${FETCHCONTENT_BASE_DIR}/imguizmo
+)
+
 set(imgui_SOURCE_SYMLINK_DIR ${FETCHCONTENT_BASE_DIR}/imgui)
+
+file(GLOB imguizmo_files
+     "${imguizmo_SOURCE_DIR}/*.h"
+     "${imguizmo_SOURCE_DIR}/*.cpp"
+)
+
+message(STATUS "imguizmo_files: ${imguizmo_files}")
 
 set(imgui_SOURCES
   ${imgui_SOURCE_SYMLINK_DIR}/imgui.cpp
@@ -73,7 +93,7 @@ set(imgui_HEADERS
   # ${imgui_color_text_edit_SOURCE_DIR}/TextEditor.h
   )
 
-add_library(ImGui STATIC ${imgui_SOURCES} ${imgui_HEADERS})
+add_library(ImGui STATIC ${imgui_SOURCES} ${imgui_HEADERS} ${imguizmo_files})
 
 target_link_libraries(ImGui
                       PUBLIC
