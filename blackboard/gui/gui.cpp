@@ -345,18 +345,23 @@ void entities_window(State &state)
 
     ImGui::PushStyleVar(ImGuiStyleVar_IndentSpacing, 0.0f);
     static entt::entity selected{entt::null};
-    state.view<components::Name>().each([&](const auto e, const auto &name) {
-        const auto idStr = std::to_string(entt::to_integral(e));
+    auto view = state.view<components::Name>();
+    for (auto it = view.rbegin(); it != view.rend(); ++it)
+    {
+        auto entity = *it;
+        const auto idStr = std::to_string(entt::to_integral(entity));
         ImGui::Bullet();
         ImGui::SameLine();
         ImGui::SetNextItemWidth(-1);
         static int editing{-1};
-        if (ImGui::Selectable(name.value.c_str(), selected == e, ImGuiSelectableFlags_None))
+        const auto &name = state.get<components::Name>(entity);
+        if (ImGui::Selectable(name.value.c_str(), selected == entity, ImGuiSelectableFlags_None))
         {
-            selected = e;
+            selected = entity;
             ImGui::OpenPopup((char *)&selected);
         }
-    });
+    }
+
     ImGui::PopStyleVar();
     ImGui::EndGroup();
 
