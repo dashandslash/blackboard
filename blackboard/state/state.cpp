@@ -13,12 +13,7 @@ namespace blackboard {
 entt::dense_map<std::string, State> states;
 
 State::State()
-{
-    meta::register_component<components::Transform>("Transform");
-    meta::register_component<components::Animation>("Animation");
-    meta::register_component<components::Uuid>("Uuid");
-    meta::register_component<components::Name>("Name");
-}
+{}
 
 entt::entity State::create_entity(std::string &&name)
 {
