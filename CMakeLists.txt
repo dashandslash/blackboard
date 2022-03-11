@@ -6,15 +6,13 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 include(cmake/fetch_external_dependencies.cmake)
 
 set(PROJECT_NAME blackboard)
-
-project(${PROJECT_NAME})
+project (${PROJECT_NAME})
 
 if(MSVC)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
 endif()
 
 include_directories(${PROJECT_SOURCE_DIR})
-include_directories(${PROJECT_NAME})
 
-add_subdirectory(example)
-add_subdirectory(${PROJECT_NAME})
+add_subdirectory(blackboard_editor)
+add_subdirectory(blackboard_core)

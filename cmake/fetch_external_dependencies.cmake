@@ -82,7 +82,7 @@ set(imgui_SOURCES
   )
 
 set(imgui_HEADERS
-  ${CMAKE_CURRENT_SOURCE_DIR}/blackboard/gui/imconfig.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/blackboard_core/gui/imconfig.h
   ${imgui_SOURCE_SYMLINK_DIR}/imgui.h
   ${imgui_SOURCE_SYMLINK_DIR}/imstb_rectpack.h
   ${imgui_SOURCE_SYMLINK_DIR}/imstb_truetype.h

@@ -11,7 +11,7 @@ Support for:
 ```
 mkdir .build && cd .build
 cmake .. -G Xcode
-cmake --build . --target blackboard_example -j
+cmake --build . --target blackboard_editor -j
 ```
 
-![Alt Text](https://github.com/dashandslash/blackboard/blob/main/example/example.gif)
+![Alt Text](https://github.com/dashandslash/blackboard/blob/main/screenshot.png)
