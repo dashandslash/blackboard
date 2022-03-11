@@ -10,7 +10,6 @@
 #include <blackboard_core/renderer/layouts.h>
 #include <blackboard_core/renderer/renderer.h>
 #include <blackboard_core/renderer/utils.h>
-#include <blackboard_core/scene/components/animation.h>
 #include <blackboard_core/scene/components/transform.h>
 #include <blackboard_core/state/state.h>
 
@@ -64,16 +63,6 @@ void init()
 
     auto e = state.create_entity();
     auto &tr_start = state.emplace_component<core::components::Transform>(e);
-    tr_start.translation = {-5.0f, 0.0f, 0.0f};
-    tr_start.rotation = glm::quat(glm::radians(glm::vec3{-0, -0.0f, -180.0f}));
-    auto tr_end = core::components::Transform();
-    tr_end.rotation = glm::quat(glm::radians(glm::vec3{120, -0.0f, 180.0f}));
-    tr_end.translation = glm::vec3{5.0f, 0.0f, 0.0f};
-    tr_end.scale = glm::vec3{.10f, 0.10f, 0.10f};
-
-    core::factories::create_animation(
-      state, e, std::move(tr_start), std::move(tr_end),
-      std::move(core::components::Animation::Info{.start_time = 1000.0f, .end_time = 2000.0, .loop = true}));
 }
 
 void render_ui()
@@ -118,9 +107,6 @@ void app_update()
     uniform.u_time = core::App::elapsed_time();
 
     auto &state = core::get_state(state_name);
-
-    state.view<core::components::Animation>().each(
-      [](const auto, core::components::Animation &anim) { anim.update(core::App::delta_time()); });
 
     state.view<core::components::Transform>().each([](const auto, core::components::Transform &transform) {
         auto mtx = glm::value_ptr(transform.get_transform());
