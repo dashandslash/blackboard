@@ -117,6 +117,7 @@ public:
     Animation &operator=(const Animation &other)
     {
         p_impl = other.p_impl->clone();
+        return *this;
     }
 
     template<typename T>
