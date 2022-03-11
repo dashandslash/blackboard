@@ -134,7 +134,7 @@ void dockspace()
     }
 
     menu_bar();
-    
+
     ImGui::End();
 
     if (show_demo_window)
@@ -170,11 +170,11 @@ void entities_window(core::State &state)
     for (auto it = view.rbegin(); it != view.rend(); ++it)
     {
         auto entity = *it;
-        if(state.all_of<core::components::Animation>(entity))
+        if (state.all_of<core::components::Animation>(entity))
         {
             continue;
         }
-        
+
         const auto idStr = std::to_string(entt::to_integral(entity));
         ImGui::Bullet();
         ImGui::SameLine();
@@ -231,17 +231,19 @@ void entities_window(core::State &state)
 
             auto draw_transform_fn = [&](core::components::Transform &tr) -> bool {
                 auto vec3_rotation = glm::degrees(glm::eulerAngles(tr.rotation));
-                auto modified = core::gui::draw_component_parameter("Translation", &core::gui::vec3_control, tr.translation,
-                                                         0.0f, -180.0f, 180.0f, 150.0f);
-                modified |= core::gui::draw_component_parameter("Rotation", &core::gui::vec3_control, vec3_rotation, 0.0f,
-                                                     -180.0f, 180.0f, 150.0f);
-                modified |= core::gui::draw_component_parameter("Scale", &core::gui::vec3_control, tr.scale, 1.0f, -180.0f,
-                                                     180.0f, 150.0f);
+                auto modified =
+                  core::gui::draw_component_parameter("Translation", &core::gui::vec3_control,
+                                                      tr.translation, 0.0f, -180.0f, 180.0f, 150.0f);
+                modified |= core::gui::draw_component_parameter(
+                  "Rotation", &core::gui::vec3_control, vec3_rotation, 0.0f, -180.0f, 180.0f, 150.0f);
+                modified |= core::gui::draw_component_parameter(
+                  "Scale", &core::gui::vec3_control, tr.scale, 1.0f, -180.0f, 180.0f, 150.0f);
                 return modified;
             };
 
             // Transform
-            core::gui::draw_component<core::components::Transform>(state, selected, "Transform", draw_transform_fn);
+            core::gui::draw_component<core::components::Transform>(state, selected, "Transform",
+                                                                   draw_transform_fn);
 
             //             Animation
             ImGui::PushID("Animation_tr");

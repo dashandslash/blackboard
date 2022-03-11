@@ -30,8 +30,8 @@ bgfx::IndexBufferHandle ibh;
 blackboard::core::renderer::CameraPersp cam;
 bgfx::FrameBufferHandle frameBufferHandle = BGFX_INVALID_HANDLE;
 core::renderer::material::Uniform uniform = {.u_color = {1.0, 1.0, 1.0, 1.0},
-                                       .u_edge_color{0.0f, 0.0f, 0.0f, 1.0f},
-                                       .u_edge_thickness = 3.5f};
+                                             .u_edge_color{0.0f, 0.0f, 0.0f, 1.0f},
+                                             .u_edge_thickness = 3.5f};
 
 static const std::string state_name{"default_state"};
 
@@ -108,20 +108,22 @@ void app_update()
 
     auto &state = core::get_state(state_name);
 
-    state.view<core::components::Transform>().each([](const auto, core::components::Transform &transform) {
-        auto mtx = glm::value_ptr(transform.get_transform());
+    state.view<core::components::Transform>().each(
+      [](const auto, core::components::Transform &transform) {
+          auto mtx = glm::value_ptr(transform.get_transform());
 
-        bgfx::setVertexBuffer(0, vbh);
-        bgfx::setIndexBuffer(ibh);
-        bgfx::setTransform(mtx);
-        bgfx::setState(0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_WRITE_Z |
-                       BGFX_STATE_DEPTH_TEST_LESS | /*BGFX_STATE_CULL_CCW |*/ BGFX_STATE_MSAA);
-        auto prog = core::renderer::material_manager().material<core::renderer::material::UniformColor>();
+          bgfx::setVertexBuffer(0, vbh);
+          bgfx::setIndexBuffer(ibh);
+          bgfx::setTransform(mtx);
+          bgfx::setState(0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_WRITE_Z |
+                         BGFX_STATE_DEPTH_TEST_LESS | /*BGFX_STATE_CULL_CCW |*/ BGFX_STATE_MSAA);
+          auto prog =
+            core::renderer::material_manager().material<core::renderer::material::UniformColor>();
 
-        core::renderer::material_manager().set_uniform(&uniform);
+          core::renderer::material_manager().set_uniform(&uniform);
 
-        bgfx::submit(5, prog->program_handle());
-    });
+          bgfx::submit(5, prog->program_handle());
+      });
 
     render_ui();
 }

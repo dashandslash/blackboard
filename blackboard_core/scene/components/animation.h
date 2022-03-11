@@ -110,7 +110,6 @@ public:
         : p_impl{new Animation_model<T>(value, std::move(from), std::move(to), std::move(info))}
     {}
 
-
     Animation(const Animation &other): p_impl(other.p_impl->clone())
     {}
 

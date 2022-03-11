@@ -44,14 +44,16 @@ bgfx::ShaderHandle loadShader(const std::filesystem::path &filePath)
     return {bgfx::kInvalidHandle};
 }
 
-int compileShader(const std::filesystem::path &shaderFile, blackboard::core::renderer::Program::Type type)
+int compileShader(const std::filesystem::path &shaderFile,
+                  blackboard::core::renderer::Program::Type type)
 {
     std::string cmd =
       blackboard::core::resources::path().append(shaderc_binary).string();    // shaderc binary
     cmd.append(" -f " + shaderFile.string());    // input file
     cmd.append(" -o " + shaderFile.string() + shader_bin_extension);    // output file
-    cmd.append(" -i " +
-               blackboard::core::resources::path().append("shaders/common").string());    // include path
+    cmd.append(
+      " -i " +
+      blackboard::core::resources::path().append("shaders/common").string());    // include path
     cmd.append(blackboard::core::renderer::Program::TypeFlag[type]);    // shader type
     cmd.append(shader_platform_flags);    // platform flags
     switch (type)
