@@ -1,12 +1,13 @@
 #pragma once
 
 #ifdef _WIN32
-#include "Rpc.h"
+#pragma comment(lib, "rpcrt4.lib")
 #include <windows.h>
-#pragma comment(lib, "Rpcrt4.lib")
 #elif __APPLE__
 #include <uuid/uuid.h>
 #endif
+
+#include <string>
 
 namespace blackboard::core::components {
 
