@@ -52,10 +52,6 @@ if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
     target_link_libraries(${PROJECT_NAME}
                     PUBLIC
                     blackboard_core
-                    bgfx
-                    bx
-                    EnTT
-                    glm
 )
 
     target_compile_definitions(${PROJECT_NAME} PRIVATE "-D_CRT_SECURE_NO_WARNINGS" "-D__STDC_FORMAT_MACROS")

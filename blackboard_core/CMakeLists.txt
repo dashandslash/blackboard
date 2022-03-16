@@ -10,10 +10,12 @@ add_library(${PROJECT_NAME} STATIC ${SOURCES} ${HEADERS})
 target_link_libraries(${PROJECT_NAME}
                       PRIVATE
                       SDL2-static
+                      ImGui
+                      PUBLIC
+                      assimp
                       bgfx
                       bx
                       EnTT
-			          ImGui
                       glm
 )
 
