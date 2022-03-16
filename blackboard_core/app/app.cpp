@@ -42,7 +42,12 @@ App::App(const char *app_name, const renderer::Api renderer_api, const uint16_t 
 void App::run()
 {
     on_init();
-    ImGui::LoadIniSettingsFromDisk((resources::path() / "imgui.ini").string().c_str());
+    auto layout_ui = resources::path() / "imgui.ini";
+    if (!std::filesystem::exists(layout_ui))
+    {
+        layout_ui = resources::path() / "assets/layouts/default_imgui.ini";
+    }
+    ImGui::LoadIniSettingsFromDisk(layout_ui.string().c_str());
     const auto [drawable_width, drawable_height] = m_window.get_size_in_pixels();
     on_resize(drawable_width, drawable_height);
 
