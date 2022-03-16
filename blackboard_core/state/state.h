@@ -65,6 +65,17 @@ struct State
         m_registry.each(std::forward<Func>(func));
     }
 
+    decltype(auto) storage(const entt::id_type id) const
+    {
+        return m_registry.storage(id);
+    }
+
+    template<typename... T>
+    decltype(auto) clear()
+    {
+        return m_registry.clear<T...>();
+    }
+
     //private:
     entt::registry m_registry;
 };
