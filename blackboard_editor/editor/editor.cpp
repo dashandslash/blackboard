@@ -92,6 +92,11 @@ void reflection_inspector()
     ImGui::End();
 }
 
+void init()
+{
+    ImGui::GetIO().ConfigWindowsMoveFromTitleBarOnly = true;
+}
+
 void dockspace()
 {
     static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;

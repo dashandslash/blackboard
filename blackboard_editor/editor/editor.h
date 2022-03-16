@@ -11,6 +11,8 @@ struct State;
 }
 namespace editor {
 
+void init();
+
 void dockspace();
 
 void entities_window(core::State &state);
