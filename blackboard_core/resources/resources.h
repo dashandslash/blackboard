@@ -1,15 +1,7 @@
 #pragma once
-
-#include <assimp/Importer.hpp>
-#include <assimp/postprocess.h>
-#include <assimp/scene.h>
-#include <bgfx/bgfx.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/string_cast.hpp>
+#include <blackboard_core/resources/mesh.h>
 
 #include <filesystem>
-#include <vector>
 
 namespace blackboard::core::resources {
 
