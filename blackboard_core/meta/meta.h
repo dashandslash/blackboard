@@ -1,6 +1,8 @@
 #pragma once
 #include "scene/components/animation.h"
 #include "scene/components/name.h"
+#include "scene/components/resource.h"
+#include "scene/components/selected.h"
 #include "scene/components/transform.h"
 #include "scene/components/uuid.h"
 
@@ -43,7 +45,8 @@ inline Meta_infos meta_components_infos = {
   meta::impl::create_meta<components::Name>("Name"),
   meta::impl::create_meta<components::Transform>("Transform"),
   meta::impl::create_meta<components::Animation>("Animation"),
-};
+  meta::impl::create_meta<components::model_resource_key>("Model Resource Key"),
+  meta::impl::create_meta<components::Selected>("Selected")};
 }    // namespace impl
 
 template<typename T>
