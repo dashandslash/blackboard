@@ -1,4 +1,4 @@
-$input v_view, v_pos, v_bc, v_normal
+$input v_view, v_position, v_bc, v_normal, v_texcoord0, v_color0, v_tangent, v_bitangent
 
 /*
  * Copyright 2016 Dario Manesku. All rights reserved.
@@ -73,4 +73,5 @@ void main()
 //    }
 
     gl_FragColor = lerp(u_color, u_edge_color, step(edge, 0.9));
+    gl_FragColor.rgb = abs(v_normal);
 }
