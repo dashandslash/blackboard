@@ -10,6 +10,8 @@
 #include <blackboard_core/renderer/layouts.h>
 #include <blackboard_core/renderer/renderer.h>
 #include <blackboard_core/renderer/utils.h>
+#include <blackboard_core/resources/mesh.h>
+#include <blackboard_core/resources/resources.h>
 #include <blackboard_core/scene/components/transform.h>
 #include <blackboard_core/state/state.h>
 
@@ -25,27 +27,19 @@
 using namespace blackboard;
 using namespace blackboard::core::renderer::layouts;
 
-bgfx::VertexBufferHandle vbh;
-bgfx::IndexBufferHandle ibh;
 blackboard::core::renderer::CameraPersp cam;
 bgfx::FrameBufferHandle frameBufferHandle = BGFX_INVALID_HANDLE;
 core::renderer::material::Uniform uniform = {.u_color = {1.0, 1.0, 1.0, 1.0},
                                              .u_edge_color{0.0f, 0.0f, 0.0f, 1.0f},
                                              .u_edge_thickness = 3.5f};
 
+entt::id_type model_identifier{entt::null};
+
 static const std::string state_name{"default_state"};
 
 void init()
 {
     using namespace core::renderer::layouts;
-
-    vbh = bgfx::createVertexBuffer(
-      bgfx::makeRef(cube_position_normal_barycenter.data(),
-                    sizeof(decltype(cube_position_normal_barycenter)::value_type) *
-                      cube_position_normal_barycenter.size()),
-      Position_normal_barycenter::layout());
-    ibh = bgfx::createIndexBuffer(bgfx::makeRef(
-      cube_indices.data(), sizeof(decltype(cube_indices)::value_type) * cube_indices.size()));
 
     const auto imgui_ini_path = (core::resources::path() / "imgui.ini").string();
 
@@ -63,69 +57,29 @@ void init()
 
     auto e = state.create_entity();
     auto &tr_start = state.emplace_component<core::components::Transform>(e);
-}
 
-void render_ui()
-{
-    editor::dockspace();
-    ImGui::Begin("Settings");
-    ImGui::ColorEdit4("u_color", uniform.u_color.data());
-    ImGui::ColorEdit4("u_edge_color", uniform.u_edge_color.data());
-    ImGui::SliderFloat("u_edge_thickness", &uniform.u_edge_thickness, 0.0f, 20.0f);
-    ImGui::End();
+    model_identifier =
+      core::resources::load_model(core::resources::path() / "assets/models/Sponza/glTF/Sponza.gltf");
 
-    auto &state = core::get_state(state_name);
-
-    editor::entities_window(state);
-
-    ImGui::Begin("Viewport");
-    ImVec2 size(ImGui::GetContentRegionAvail().x,
-                ImGui::GetContentRegionAvail().x / (1280.0f / 720.0f));
-    if (bgfx::isValid(frameBufferHandle))
+    if (core::resources::is_valid_model_id(model_identifier))
     {
-        ImGui::Image(core::gui::toId(bgfx::getTexture(frameBufferHandle), UINT8_C(0x01), 0),
-                     ImVec2(ImGui::GetContentRegionAvail().x,
-                            ImGui::GetContentRegionAvail().x / (1280.0f / 720.0f)),
-                     ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f),
-                     ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+        for (auto &&mesh : core::resources::get_model_ref(model_identifier).meshes)
+        {
+            mesh.vbh = bgfx::createVertexBuffer(
+              bgfx::makeRef(mesh.vertices.data(),
+                            sizeof(core::resources::Vertex) * mesh.vertices.size()),
+              Position_normal_tangent_bitangent_color_uv::layout());
+            mesh.ibh = bgfx::createIndexBuffer(
+              bgfx::makeRef(mesh.indices.data(), sizeof(uint32_t) * mesh.indices.size()),
+              BGFX_BUFFER_INDEX32);
+        }
     }
-    ImGui::End();
-}
 
-void app_update()
-{
-    cam.setEyePoint({0.0, 0.0, -12.0f});
-    cam.setPerspective(40.0f, 1280.0f / 720.0f, 0.1f, 1000.0f);
+    editor::init();
+
+    cam.setEyePoint({0.0, 0.0, -1200.0f});
+    cam.setPerspective(40.0f, 1280.0f / 720.0f, 0.1f, 100000.0f);
     cam.lookAt({0.0f, 0.0f, 0.0f});
-
-    const auto &view = cam.getViewMatrix();
-    const auto &proj = cam.getProjectionMatrix();
-    bgfx::setViewTransform(5, glm::value_ptr(view), glm::value_ptr(proj));
-    bgfx::setViewClear(5, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x000000ff, 1.0f, 0);
-
-    uniform.u_camera_position = {cam.getEyePoint().x, cam.getEyePoint().y, cam.getEyePoint().z};
-    uniform.u_time = core::App::elapsed_time();
-
-    auto &state = core::get_state(state_name);
-
-    state.view<core::components::Transform>().each(
-      [](const auto, core::components::Transform &transform) {
-          auto mtx = glm::value_ptr(transform.get_transform());
-
-          bgfx::setVertexBuffer(0, vbh);
-          bgfx::setIndexBuffer(ibh);
-          bgfx::setTransform(mtx);
-          bgfx::setState(0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_WRITE_Z |
-                         BGFX_STATE_DEPTH_TEST_LESS | /*BGFX_STATE_CULL_CCW |*/ BGFX_STATE_MSAA);
-          auto prog =
-            core::renderer::material_manager().material<core::renderer::material::UniformColor>();
-
-          core::renderer::material_manager().set_uniform(&uniform);
-
-          bgfx::submit(5, prog->program_handle());
-      });
-
-    render_ui();
 }
 
 void resize(const uint16_t w, const uint16_t h)
@@ -143,6 +97,85 @@ void resize(const uint16_t w, const uint16_t h)
     frameBufferHandle = bgfx::createFrameBuffer(attachments.size(), attachments.data(), true);
     bgfx::setViewRect(5, 0, 0, w, h);
     bgfx::setViewFrameBuffer(5, frameBufferHandle);
+
+    cam.setEyePoint({0.0, 0.0, -50.0f});
+    cam.setPerspective(40.0f, static_cast<float>(w) / static_cast<float>(h), 0.1f, 1000.0f);
+    cam.lookAt({0.0f, 0.0f, 0.0f});
+}
+
+void render_ui()
+{
+    editor::dockspace();
+    ImGui::Begin("Settings");
+    ImGui::ColorEdit4("u_color", uniform.u_color.data());
+    ImGui::ColorEdit4("u_edge_color", uniform.u_edge_color.data());
+    ImGui::SliderFloat("u_edge_thickness", &uniform.u_edge_thickness, 0.0f, 20.0f);
+    ImGui::End();
+
+    auto &state = core::get_state(state_name);
+
+    editor::entities_window(state);
+
+    ImGui::Begin("Viewport");
+
+    static ImVec2 curr_size{};
+
+    if (curr_size.x != ImGui::GetContentRegionAvail().x ||
+        curr_size.y != ImGui::GetContentRegionAvail().y)
+    {
+        curr_size = ImGui::GetContentRegionAvail();
+
+        resize(ImGui::GetContentRegionAvail().x * ImGui::GetWindowDpiScale(),
+               ImGui::GetContentRegionAvail().y * ImGui::GetWindowDpiScale());
+    }
+
+    ImVec2 size(ImGui::GetContentRegionAvail().x,
+                ImGui::GetContentRegionAvail().x / (1280.0f / 720.0f));
+    if (bgfx::isValid(frameBufferHandle))
+    {
+        ImGui::Image(core::gui::toId(bgfx::getTexture(frameBufferHandle), UINT8_C(0x01), 0), curr_size,
+                     ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f),
+                     ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+    }
+    ImGui::End();
+}
+
+void app_update()
+{
+    const auto &view = cam.getViewMatrix();
+    const auto &proj = cam.getProjectionMatrix();
+    bgfx::setViewTransform(5, glm::value_ptr(view), glm::value_ptr(proj));
+    bgfx::setViewClear(5, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x000000ff, 1.0f, 0);
+
+    uniform.u_camera_position = {cam.getEyePoint().x, cam.getEyePoint().y, cam.getEyePoint().z};
+    uniform.u_time = core::App::elapsed_time();
+
+    auto &state = core::get_state(state_name);
+
+    static core::resources::Model empty_model;
+    static auto &model = core::resources::is_valid_model_id(model_identifier) ?
+                           core::resources::get_model_ref(model_identifier) :
+                           empty_model;
+
+    state.view<core::components::Transform>().each(
+      [&](const auto, core::components::Transform &transform) {
+          bgfx::setState(0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_WRITE_Z |
+                         BGFX_STATE_DEPTH_TEST_LESS | /*BGFX_STATE_CULL_CCW |*/ BGFX_STATE_MSAA);
+          auto prog =
+            core::renderer::material_manager().material<core::renderer::material::UniformColor>();
+
+          core::renderer::material_manager().set_uniform(&uniform);
+
+          for (auto &&mesh : model.meshes)
+          {
+              bgfx::setVertexBuffer(0, mesh.vbh);
+              bgfx::setIndexBuffer(mesh.ibh);
+              bgfx::setTransform(glm::value_ptr(transform.get_transform()));
+              bgfx::submit(5, prog->program_handle());
+          }
+      });
+
+    render_ui();
 }
 
 int main(int argc, char *argv[])
@@ -157,7 +190,7 @@ int main(int argc, char *argv[])
     {
         core::App app("Example SDL", core::renderer::Api::count);    // autodetect renderer api
         app.on_update = app_update;
-        app.on_resize = resize;
+        //        app.on_resize = resize;
         app.on_init = init;
         app.run();
     }
