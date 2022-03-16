@@ -112,11 +112,6 @@ void resize(const uint16_t w, const uint16_t h)
 void render_ui()
 {
     editor::dockspace();
-    ImGui::Begin("Settings");
-    ImGui::ColorEdit4("u_color", uniform.u_color.data());
-    ImGui::ColorEdit4("u_edge_color", uniform.u_edge_color.data());
-    ImGui::SliderFloat("u_edge_thickness", &uniform.u_edge_thickness, 0.0f, 20.0f);
-    ImGui::End();
 
     auto &state = core::get_state(state_name);
 
