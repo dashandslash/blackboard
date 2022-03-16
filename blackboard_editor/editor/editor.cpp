@@ -242,6 +242,14 @@ void entities_window(core::State &state)
                   "Rotation", &core::gui::vec3_control, vec3_rotation, 0.0f, -180.0f, 180.0f, 150.0f);
                 modified |= core::gui::draw_component_parameter(
                   "Scale", &core::gui::vec3_control, tr.scale, 1.0f, -180.0f, 180.0f, 150.0f);
+
+                if (modified)
+                {
+                    state.patch<core::components::Transform>(
+                      selected, [&](core::components::Transform &tr) {
+                          tr.rotation = glm::quat(glm::radians(vec3_rotation));
+                      });
+                }
                 return modified;
             };
 
