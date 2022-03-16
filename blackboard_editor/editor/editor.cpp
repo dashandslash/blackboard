@@ -82,8 +82,7 @@ void reflection_inspector()
                 for (const auto &[state_name, state] : states)
                 {
                     ImGui::TableNextColumn();
-                    ImGui::Text(
-                      "%s", std::to_string(state.m_registry.storage(type_index)->second.size()).data());
+                    ImGui::Text("%s", std::to_string(state.storage(type_index)->second.size()).data());
                 }
             }
             ImGui::EndTable();
@@ -189,7 +188,7 @@ void entities_window(core::State &state)
         if (ImGui::Selectable(name.value.c_str(), selected == entity, ImGuiSelectableFlags_None))
         {
             selected = entity;
-            state.m_registry.clear<core::components::Selected>();
+            state.clear<core::components::Selected>();
             state.emplace_component<core::components::Selected>(entity);
             ImGui::OpenPopup((char *)&selected);
         }
