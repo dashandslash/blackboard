@@ -148,6 +148,11 @@ void set_dracula_theme()
     colors[ImGuiCol_TableHeaderBg] = comment;
     colors[ImGuiCol_TableBorderLight] = dark_alpha_purple;
     colors[ImGuiCol_TableBorderStrong] = dark_alpha_purple;
+
+    ImGui::GetStyle().FramePadding = {1.0f, 1.0f};
+    ImGui::GetStyle().CellPadding = {2.0f, 2.0f};
+    ImGui::GetStyle().TabBorderSize = 1.0f;
+    ImGui::GetStyle().TabRounding = 0.0f;
 }
 
 void load_font(const std::filesystem::path &path, const float size, const bool set_as_default)
