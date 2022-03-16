@@ -12,6 +12,7 @@
 #include <blackboard_core/renderer/utils.h>
 #include <blackboard_core/resources/mesh.h>
 #include <blackboard_core/resources/resources.h>
+#include <blackboard_core/scene/components/resource.h>
 #include <blackboard_core/scene/components/transform.h>
 #include <blackboard_core/state/state.h>
 
@@ -33,7 +34,7 @@ core::renderer::material::Uniform uniform = {.u_color = {1.0, 1.0, 1.0, 1.0},
                                              .u_edge_color{0.0f, 0.0f, 0.0f, 1.0f},
                                              .u_edge_thickness = 3.5f};
 
-entt::id_type model_identifier{entt::null};
+entt::id_type model_key{entt::null};
 
 static const std::string state_name{"default_state"};
 
@@ -58,12 +59,12 @@ void init()
     auto e = state.create_entity();
     auto &tr_start = state.emplace_component<core::components::Transform>(e);
 
-    model_identifier =
+    model_key =
       core::resources::load_model(core::resources::path() / "assets/models/Sponza/glTF/Sponza.gltf");
 
-    if (core::resources::is_valid_model_id(model_identifier))
+    if (core::resources::is_valid_model_key(model_key))
     {
-        for (auto &&mesh : core::resources::get_model_ref(model_identifier).meshes)
+        for (auto &&mesh : core::resources::get_model_ref(model_key).meshes)
         {
             mesh.vbh = bgfx::createVertexBuffer(
               bgfx::makeRef(mesh.vertices.data(),
@@ -73,6 +74,8 @@ void init()
               bgfx::makeRef(mesh.indices.data(), sizeof(uint32_t) * mesh.indices.size()),
               BGFX_BUFFER_INDEX32);
         }
+
+        state.emplace_component<core::components::Resource_key<core::resources::Model>>(e, model_key);
     }
 
     editor::init();
@@ -152,13 +155,8 @@ void app_update()
 
     auto &state = core::get_state(state_name);
 
-    static core::resources::Model empty_model;
-    static auto &model = core::resources::is_valid_model_id(model_identifier) ?
-                           core::resources::get_model_ref(model_identifier) :
-                           empty_model;
-
-    state.view<core::components::Transform>().each(
-      [&](const auto, core::components::Transform &transform) {
+    state.view<core::components::Transform, core::components::model_resource_key>().each(
+      [&](const auto, const auto &transform, const auto &key) {
           bgfx::setState(0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_WRITE_Z |
                          BGFX_STATE_DEPTH_TEST_LESS | /*BGFX_STATE_CULL_CCW |*/ BGFX_STATE_MSAA);
           auto prog =
@@ -166,7 +164,7 @@ void app_update()
 
           core::renderer::material_manager().set_uniform(&uniform);
 
-          for (auto &&mesh : model.meshes)
+          for (auto &&mesh : core::resources::get_model_ref(key).meshes)
           {
               bgfx::setVertexBuffer(0, mesh.vbh);
               bgfx::setIndexBuffer(mesh.ibh);
