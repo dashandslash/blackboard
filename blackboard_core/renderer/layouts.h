@@ -92,6 +92,42 @@ private:
     inline static bgfx::VertexLayout m_layout;
 };
 
+struct Position_normal_tangent_bitangent_color_uv
+{
+    std::array<float, 3> pos;
+    std::array<float, 3> normal;
+    std::array<float, 3> tangent;
+    std::array<float, 3> bitangent;
+    std::array<float, 4> color;
+    std::array<float, 2> uv;
+
+    inline static bgfx::VertexLayout layout()
+    {
+        static bool is_init{false};
+
+        if (!is_init)
+        {
+            init();
+            is_init = true;
+        }
+        return m_layout;
+    }
+
+private:
+    inline static void init()
+    {
+        m_layout.begin()
+          .add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
+          .add(bgfx::Attrib::Normal, 4, bgfx::AttribType::Uint8, true, true)
+          .add(bgfx::Attrib::Tangent, 4, bgfx::AttribType::Uint8, true, true)
+          .add(bgfx::Attrib::Bitangent, 4, bgfx::AttribType::Uint8, true, true)
+          .add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true, true)
+          .add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)    //, true, false)
+          .end();
+    }
+    inline static bgfx::VertexLayout m_layout;
+};
+
 struct Position_normal_barycenter
 {
     std::array<float, 3> pos;
@@ -122,7 +158,7 @@ private:
     inline static bgfx::VertexLayout m_layout;
 };
 
-uint32_t encode_normal_rgba8(float _x, float _y = 0.0f, float _z = 0.0f, float _w = 0.0f)
+inline uint32_t encode_normal_rgba8(float _x, float _y, float _z, float _w = 0.0f)
 {
     const float src[] = {
       _x * 0.5f + 0.5f,
@@ -135,7 +171,7 @@ uint32_t encode_normal_rgba8(float _x, float _y = 0.0f, float _z = 0.0f, float _
     return dst;
 }
 
-std::tuple<std::vector<uint16_t>, std::vector<Position_normal_barycenter>>
+inline std::tuple<std::vector<uint16_t>, std::vector<Position_normal_barycenter>>
   generate_position_normal_barycenter(const std::span<const uint16_t> &indices,
                                       const std::span<const Position_normal> &layout)
 {
