@@ -162,7 +162,7 @@ struct Model_loader : entt::resource_loader<Model_loader, Model>
 
         auto importer = std::make_unique<Assimp::Importer>();
 
-        auto scene = importer->ReadFile(path.c_str(), impl::mesh_import_flags);
+        auto scene = importer->ReadFile(path.string().data(), impl::mesh_import_flags);
 
         if (!scene || !scene->HasMeshes())
         {
