@@ -145,4 +145,37 @@ if(NOT bgfx_cmake_POPULATED)
 	add_subdirectory(${bgfx_cmake_SOURCE_DIR} ${bgfx_cmake_BINARY_DIR} EXCLUDE_FROM_ALL)
 endif()
 
-message(STATUS "bgfx_cmake_SOURCE_DIR: ${bgfx_cmake_SOURCE_DIR}")
+# assimp
+FetchContent_Declare(
+                     assimp
+                     GIT_REPOSITORY https://github.com/assimp/assimp.git
+                     GIT_TAG v5.2.2
+                     GIT_SHALLOW 1
+)
+FetchContent_GetProperties(assimp)
+
+if(NOT assimp_POPULATED)
+	FetchContent_Populate(assimp)
+
+  set(ASSIMP_COVERALLS OFF CACHE INTERNAL "" FORCE)
+  set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE INTERNAL "" FORCE)
+  set(ASSIMP_BUILD_SAMPLES OFF CACHE INTERNAL "" FORCE)
+  set(ASSIMP_DOUBLE_PRECISION OFF CACHE INTERNAL "" FORCE)
+  set(ASSIMP_BUILD_TESTS OFF CACHE INTERNAL "" FORCE)
+  set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "" FORCE)
+  set(ASSIMP_INSTALL_PDB OFF CACHE INTERNAL "" FORCE)
+  set(IGNORE_GIT_HASH OFF CACHE INTERNAL "" FORCE)
+  set(INJECT_DEBUG_POSTFIX OFF CACHE INTERNAL "" FORCE )
+  set(ASSIMP_INSTALL OFF CACHE INTERNAL "" FORCE)
+
+  if(APPLE)
+  set(BUILD_FRAMEWORK ON CACHE INTERNAL "" FORCE)
+  endif()
+
+  
+
+	add_subdirectory(${assimp_SOURCE_DIR} ${assimp_BINARY_DIR} EXCLUDE_FROM_ALL)
+endif()
+
+
+# FetchContent_MakeAvailable(assimp)
