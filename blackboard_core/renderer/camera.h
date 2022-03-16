@@ -152,7 +152,7 @@ public:
         return mProjectionMatrix;
     }
     //! Returns the Camera's View matrix, which converts world-space into view-space
-    virtual const glm::mat4 &getViewMatrix() const
+    virtual glm::mat4 &getViewMatrix() const
     {
         if (!mModelViewCached)
             calcViewMatrix();

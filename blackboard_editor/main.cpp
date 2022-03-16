@@ -13,6 +13,7 @@
 #include <blackboard_core/resources/mesh.h>
 #include <blackboard_core/resources/resources.h>
 #include <blackboard_core/scene/components/resource.h>
+#include <blackboard_core/scene/components/selected.h>
 #include <blackboard_core/scene/components/transform.h>
 #include <blackboard_core/state/state.h>
 
@@ -20,6 +21,8 @@
 #include <glm/ext.hpp>
 #include <glm/gtx/matrix_interpolation.hpp>
 #include <imgui/imgui.h>
+#include <imgui/imgui_internal.h>
+#include <imguizmo/ImGuizmo.h>
 
 #include <filesystem>
 #include <iostream>
@@ -121,25 +124,52 @@ void render_ui()
 
     ImGui::Begin("Viewport");
 
-    static ImVec2 curr_size{};
-
-    if (curr_size.x != ImGui::GetContentRegionAvail().x ||
-        curr_size.y != ImGui::GetContentRegionAvail().y)
+    // resize framebuffer if needed
+    static ImVec2 viewport_window_size{};
+    if (ImLengthSqr(viewport_window_size - ImGui::GetContentRegionAvail()) != 0.0f &&
+        ImGui::GetContentRegionAvail().x > 0.0f && ImGui::GetContentRegionAvail().y > 0.0f)
     {
-        curr_size = ImGui::GetContentRegionAvail();
+        viewport_window_size = ImGui::GetContentRegionAvail();
 
         resize(ImGui::GetContentRegionAvail().x * ImGui::GetWindowDpiScale(),
                ImGui::GetContentRegionAvail().y * ImGui::GetWindowDpiScale());
     }
 
-    ImVec2 size(ImGui::GetContentRegionAvail().x,
-                ImGui::GetContentRegionAvail().x / (1280.0f / 720.0f));
+    // show the framebuffer within the viewport
     if (bgfx::isValid(frameBufferHandle))
     {
-        ImGui::Image(core::gui::toId(bgfx::getTexture(frameBufferHandle), UINT8_C(0x01), 0), curr_size,
-                     ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f),
-                     ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+        ImGui::Image(core::gui::toId(bgfx::getTexture(frameBufferHandle), UINT8_C(0x01), 0),
+                     viewport_window_size, ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f),
+                     ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
     }
+
+    // show the guizmo when an entity with transform comp is selected
+
+    if (auto view = state.view<core::components::Transform, core::components::Selected>();
+        view.front() != entt::null)
+    {
+        // Selected comp is an empty type
+        auto &&[_, transform_comp] = *view.each().begin();
+        ImGuizmo::SetOrthographic(false);
+        ImGuizmo::SetDrawlist();
+        ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, viewport_window_size.x,
+                          viewport_window_size.y);
+        auto transform = transform_comp.get_transform();
+        if (ImGuizmo::Manipulate(glm::value_ptr(cam.getViewMatrix()),
+                                 glm::value_ptr(cam.getProjectionMatrix()), ImGuizmo::OPERATION::ROTATE,
+                                 ImGuizmo::LOCAL, glm::value_ptr(transform), nullptr, nullptr))
+        {
+            transform_comp.set_transform(transform);
+        }
+
+        auto viewManipulateRight = ImGui::GetWindowPos().x + viewport_window_size.x;
+        auto viewManipulateTop = ImGui::GetWindowPos().y;
+
+        ImGuizmo::ViewManipulate(glm::value_ptr(cam.getViewMatrix()), cam.getPivotDistance(),
+                                 ImVec2(viewManipulateRight - 128, viewManipulateTop), ImVec2(128, 128),
+                                 0x10101010);
+    }
+
     ImGui::End();
 }
 

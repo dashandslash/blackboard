@@ -9,6 +9,7 @@
 #include <bgfx/bgfx.h>
 #include <imgui/backends/imgui_impl_sdl.h>
 #include <imgui/imgui_internal.h>
+#include <imguizmo/imguizmo.h>
 
 #include <iostream>
 
@@ -72,6 +73,7 @@ void App::run()
         renderer::ImGui_Impl_sdl_bgfx_NewFrame();
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
+        ImGuizmo::BeginFrame();
 
         on_update();
         m_prev_time = std::chrono::steady_clock::now();
