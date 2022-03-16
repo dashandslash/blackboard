@@ -21,7 +21,7 @@ entt::entity State::create_entity(std::string &&name)
     m_registry.emplace<components::Uuid>(entity);
     if (name.empty())
     {
-        name = "Name_" + std::to_string(entt::to_integral(entity));
+        name = "Entity_" + std::to_string(entt::to_integral(entity));
     }
     m_registry.emplace<components::Name>(entity, name);
     return entity;
