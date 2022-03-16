@@ -73,7 +73,7 @@ void reflection_inspector()
             {
                 ImGui::TableNextRow();
                 ImGui::TableNextColumn();
-                ImGui::Text("%s", std::to_string(entt::to_integral(type_index)).data());
+                ImGui::Text("%u", entt::to_integral(type_index));
                 ImGui::TableNextColumn();
                 ImGui::Text("%s", info.name.data());
                 ImGui::TableNextColumn();
@@ -82,7 +82,9 @@ void reflection_inspector()
                 for (const auto &[state_name, state] : states)
                 {
                     ImGui::TableNextColumn();
-                    ImGui::Text("%s", std::to_string(state.storage(type_index)->second.size()).data());
+                    auto &&it = state.storage(type_index);
+                    const auto count = it->first == type_index ? it->second.size() : std::size_t(0u);
+                    ImGui::Text("%lu", count);
                 }
             }
             ImGui::EndTable();
