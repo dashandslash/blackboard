@@ -1,9 +1,15 @@
 #pragma once
 #include <blackboard_core/resources/mesh.h>
 
+#include <entt/resource/handle.hpp>
+
 #include <filesystem>
 
 namespace blackboard::core::resources {
+
+std::filesystem::path path();
+
+void init(std::filesystem::path &&app_base_path);
 
 entt::id_type load_model(std::filesystem::path &&path);
 

@@ -25,7 +25,7 @@ struct Info
 
 using Meta_infos = std::unordered_map<entt::id_type, Info>;
 
-inline constexpr auto property_name_key = entt::hashed_string("name");
+inline constexpr auto property_name_key = entt::hashed_string{"name"};
 
 namespace impl {
 
@@ -33,7 +33,7 @@ template<typename T>
 inline std::pair<const entt::id_type, Info> create_meta(std::string &&reflected_name)
 {
     entt::meta<T>()
-      .type(entt::hashed_string(reflected_name.c_str()))
+      .type(entt::hashed_string{reflected_name.c_str()})
       .prop(property_name_key, reflected_name);
 
     const entt::type_info type_info = entt::type_id<T>();

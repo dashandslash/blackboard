@@ -1,0 +1,59 @@
+#ifndef __DEFINITIONS_SH__
+#define __DEFINITIONS_SH__
+
+#define STRINGIFY2(X) #X
+#define STRINGIFY(Y) STRINGIFY2(Y)
+
+#define SAMPLER2D_TEXTURE0              Sampler_Texture0
+#define SAMPLER2D_TEXTURE0_NAME         STRINGIFY(SAMPLER2D_TEXTURE0)
+#define SAMPLER2D_TEXTURE0_STAGE        0
+
+#define SAMPLER2D_TEXTURE1              Sampler_Texture1
+#define SAMPLER2D_TEXTURE1_NAME         STRINGIFY(SAMPLER2D_TEXTURE1)
+#define SAMPLER2D_TEXTURE1_STAGE        1
+
+#define SAMPLER2D_TEXTURE2              Sampler_Texture2
+#define SAMPLER2D_TEXTURE2_NAME         STRINGIFY(SAMPLER2D_TEXTURE2)
+#define SAMPLER2D_TEXTURE2_STAGE        2
+
+#define SAMPLER2D_TEXTURE3              Sampler_Texture3
+#define SAMPLER2D_TEXTURE3_NAME         STRINGIFY(SAMPLER2D_TEXTURE3)
+#define SAMPLER2D_TEXTURE3_STAGE        3
+
+#define SAMPLER2D_ALBEDO                Sampler_Ablbedo
+#define SAMPLER2D_ALBEDO_NAME           STRINGIFY(SAMPLER2D_ALBEDO)
+#define SAMPLER2D_ALBEDO_STAGE          4
+
+#define SAMPLER2D_DIFFUSE               Sampler_Diffusee
+#define SAMPLER2D_DIFFUSE_NAME          STRINGIFY(SAMPLER2D_DIFFUSE)
+#define SAMPLER2D_DIFFUSE_STAGE         5
+
+#define SAMPLER2D_NORMALS               Sampler_Normals
+#define SAMPLER2D_NORMALS_NAME          STRINGIFY(SAMPLER2D_NORMALS)
+#define SAMPLER2D_NORMALS_STAGE         6
+
+#define SAMPLER2D_AO                    Sampler_Ambient_occlusion
+#define SAMPLER2D_AO_NAME               STRINGIFY(SAMPLER2D_AO)
+#define SAMPLER2D_AO_STAGE              7
+
+#define SAMPLER2D_EMISSIVE              Sampler_Emissive
+#define SAMPLER2D_EMISSIVE_NAME         STRINGIFY(SAMPLER2D_EMISSIVE)
+#define SAMPLER2D_EMISSIVE_STAGE        8
+
+#define SAMPLER2D_ROUGH_METALLIC        Sampler_Rough_metallic
+#define SAMPLER2D_ROUGH_METALLIC_NAME   STRINGIFY(SAMPLER2D_ROUGH_METALLIC)
+#define SAMPLER2D_ROUGH_METALLIC_STAGE  9
+
+#define SAMPLER2D_HEIGHT                Sampler_Height
+#define SAMPLER2D_HEIGHT_NAME           STRINGIFY(SAMPLER2D_HEIGHT)
+#define SAMPLER2D_HEIGHT_STAGE          10
+
+#define SAMPLER2D_OPACITY               Sampler_Opacity
+#define SAMPLER2D_OPACITY_NAME          STRINGIFY(SAMPLER2D_OPACITY)
+#define SAMPLER2D_OPACITY_STAGE         11
+
+#define SAMPLER2D_SPECULAR              Sampler_Opacity
+#define SAMPLER2D_SPECULAR_NAME         STRINGIFY(SAMPLER2D_SPECULAR)
+#define SAMPLER2D_SPECULAR_STAGE        12
+
+#endif // __DEFINITIONS_SH__

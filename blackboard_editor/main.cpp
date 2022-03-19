@@ -16,7 +16,9 @@
 #include <blackboard_core/scene/components/selected.h>
 #include <blackboard_core/scene/components/transform.h>
 #include <blackboard_core/state/state.h>
+#include <blackboard_core/utils/zip_iterator.h>
 
+#include <bgfx/bgfx.h>
 #include <entt/entt.hpp>
 #include <glm/ext.hpp>
 #include <glm/gtx/matrix_interpolation.hpp>
@@ -37,7 +39,7 @@ core::renderer::material::Uniform uniform = {.u_color = {1.0, 1.0, 1.0, 1.0},
                                              .u_edge_color{0.0f, 0.0f, 0.0f, 1.0f},
                                              .u_edge_thickness = 3.5f};
 
-entt::id_type model_key{entt::null};
+entt::id_type model_key{};
 
 static const std::string state_name{"default_state"};
 
@@ -63,7 +65,13 @@ void init()
     auto &tr_start = state.emplace_component<core::components::Transform>(e);
 
     model_key =
-      core::resources::load_model(core::resources::path() / "assets/models/Sponza/glTF/Sponza.gltf");
+      //      core::resources::load_model(core::resources::path() / "assets/models/Sponza/glTF/Sponza.gltf");
+      core::resources::load_model(core::resources::path() /
+                                  "assets/models/DamagedHelmet/glTF/DamagedHelmet.gltf");
+    //    core::resources::load_model("/Users/luca/Downloads/sponza/sponza.obj");
+    //    core::resources::load_model(core::resources::path() / "assets/models/FlightHelmet/glTF/FlightHelmet.gltf");
+    //    core::resources::load_model(core::resources::path() / "assets/models/MetalRoughSpheres/glTF/MetalRoughSpheres.gltf");
+    //    core::resources::load_model(core::resources::path() / "assets/models/ToyCar/glTF/ToyCar.gltf");
 
     if (core::resources::is_valid_model_key(model_key))
     {
@@ -76,6 +84,16 @@ void init()
             mesh.ibh = bgfx::createIndexBuffer(
               bgfx::makeRef(mesh.indices.data(), sizeof(uint32_t) * mesh.indices.size()),
               BGFX_BUFFER_INDEX32);
+
+            for (const auto &[type, image] : mesh.images)
+            {
+                const auto texture_handle = bgfx::createTexture2D(
+                  static_cast<uint16_t>(image.m_width), static_cast<uint16_t>(image.m_height), false,
+                  uint16_t{1}, static_cast<bgfx::TextureFormat::Enum>(image.m_format),
+                  BGFX_TEXTURE_NONE, bgfx::makeRef((char *)image.m_data, image.m_size));
+
+                mesh.textures.emplace(type, texture_handle);
+            }
         }
 
         state.emplace_component<core::components::Resource_key<core::resources::Model>>(e, model_key);
@@ -83,7 +101,7 @@ void init()
 
     editor::init();
 
-    cam.setEyePoint({0.0, 0.0, -1200.0f});
+    cam.setEyePoint({0.0, 0.0, -50.0f});
     cam.setPerspective(40.0f, 1280.0f / 720.0f, 0.1f, 100000.0f);
     cam.lookAt({0.0f, 0.0f, 0.0f});
 }
@@ -104,9 +122,7 @@ void resize(const uint16_t w, const uint16_t h)
     bgfx::setViewRect(5, 0, 0, w, h);
     bgfx::setViewFrameBuffer(5, frameBufferHandle);
 
-    cam.setEyePoint({0.0, 0.0, -50.0f});
     cam.setPerspective(40.0f, static_cast<float>(w) / static_cast<float>(h), 0.1f, 1000.0f);
-    cam.lookAt({0.0f, 0.0f, 0.0f});
 }
 
 void render_ui()
@@ -138,11 +154,18 @@ void render_ui()
                      ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
     }
 
-    // show the guizmo when an entity with transform comp is selected
     ImGuizmo::SetOrthographic(false);
     ImGuizmo::SetDrawlist();
     ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, viewport_window_size.x,
                       viewport_window_size.y);
+
+    auto viewManipulateRight = ImGui::GetWindowPos().x + viewport_window_size.x;
+    auto viewManipulateTop = ImGui::GetWindowPos().y;
+    ImGuizmo::ViewManipulate(glm::value_ptr(cam.getViewMatrix()), cam.getPivotDistance(),
+                             {viewManipulateRight - 128.0f, viewManipulateTop}, {128.0f, 128.0f},
+                             0x20202020);
+
+    // show the guizmo when an entity with transform comp is selected
     if (auto view = state.view<core::components::Transform, core::components::Selected>();
         view.front() != entt::null)
     {
@@ -158,13 +181,6 @@ void render_ui()
             transform_comp.set_transform(transform);
         }
     }
-
-    auto viewManipulateRight = ImGui::GetWindowPos().x + viewport_window_size.x;
-    auto viewManipulateTop = ImGui::GetWindowPos().y;
-
-    ImGuizmo::ViewManipulate(glm::value_ptr(cam.getViewMatrix()), cam.getPivotDistance(),
-                             {viewManipulateRight - 128.0f, viewManipulateTop}, {128.0f, 128.0f},
-                             0x10101010);
 
     ImGui::End();
 }
@@ -190,11 +206,15 @@ void app_update()
 
           core::renderer::material_manager().set_uniform(&uniform);
 
-          for (auto &&mesh : core::resources::get_model_ref(key).meshes)
+          for (blackboard::core::resources::Mesh &mesh : core::resources::get_model_ref(key).meshes)
           {
               bgfx::setVertexBuffer(0, mesh.vbh);
               bgfx::setIndexBuffer(mesh.ibh);
-              bgfx::setTransform(glm::value_ptr(transform.get_transform()));
+              bgfx::setTransform(glm::value_ptr(transform.get_transform() * mesh.transform));
+              for (auto &&texture : mesh.textures)
+              {
+                  core::renderer::material_manager().set_sampler(texture.first, texture.second);
+              }
               bgfx::submit(5, prog->program_handle());
           }
       });

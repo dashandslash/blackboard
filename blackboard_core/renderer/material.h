@@ -1,7 +1,7 @@
 #pragma once
 #include "program.h"
 
-#include <app/resources.h>
+#include <resources/resources.h>
 #include <utils/watchdog.h>
 
 #include <bgfx/bgfx.h>
@@ -123,6 +123,12 @@ struct Manager
             utils::wd::watchMany(vert_shader, callback_multi);
             utils::wd::watchMany(frag_shader, callback_multi);
         }
+
+        for (const auto &[type, name] : resources::Texture_type_names)
+        {
+            m_samplers_handles.emplace(type,
+                                       bgfx::createUniform(name.c_str(), bgfx::UniformType::Sampler));
+        }
     }
 
     ~Manager()
@@ -170,8 +176,14 @@ struct Manager
         bgfx::setUniform(m_uniform_handle, uniform, num);
     }
 
+    void set_sampler(const resources::Texture_type type, const bgfx::TextureHandle texture_handle)
+    {
+        bgfx::setTexture(type, m_samplers_handles.at(type), texture_handle);
+    }
+
 private:
     bgfx::UniformHandle m_uniform_handle = BGFX_INVALID_HANDLE;
+    entt::dense_map<resources::Texture_type, bgfx::UniformHandle> m_samplers_handles;
 };
 }    // namespace material
 

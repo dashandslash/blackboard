@@ -1,9 +1,19 @@
 #include "mesh.h"
 
+#include <blackboard_core/meta/meta.h>
 #include <blackboard_core/renderer/layouts.h>
+#include <blackboard_core/resources/mesh.h>
 #include <blackboard_core/scene/components/uuid.h>
 #include <blackboard_core/utils/zip_iterator.h>
 
+#include <assimp/Importer.hpp>
+#include <assimp/pbrmaterial.h>
+#include <assimp/postprocess.h>
+#include <assimp/scene.h>
+#include <bimg/decode.h>
+#include <bx/allocator.h>
+#include <bx/error.h>
+#include <bx/file.h>
 #include <entt/core/hashed_string.hpp>
 #include <entt/entity/entity.hpp>
 #include <entt/resource/cache.hpp>
@@ -11,7 +21,20 @@
 #include <entt/resource/loader.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <entt/core/hashed_string.hpp>
+#include <entt/core/type_info.hpp>
+#include <entt/core/utility.hpp>
+#include <entt/meta/container.hpp>
+#include <entt/meta/ctx.hpp>
+#include <entt/meta/factory.hpp>
+#include <entt/meta/meta.hpp>
+#include <entt/meta/pointer.hpp>
+#include <entt/meta/resolve.hpp>
+#include <entt/meta/template.hpp>
+
 #include <filesystem>
+#include <fstream>
+#include <iostream>
 #include <vector>
 
 namespace blackboard::core::resources {
@@ -66,19 +89,122 @@ glm::mat4 assimp_to_mat4(const aiMatrix4x4 &matrix)
     return result;
 }
 
-blackboard::core::resources::Mesh processMesh(aiMesh *ai_mesh, const aiScene *ai_scene)
+bx::AllocatorI *getDefaultAllocator()
 {
-    blackboard::core::resources::Mesh mesh;
+    BX_PRAGMA_DIAGNOSTIC_PUSH();
+    BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(
+      4459);    // warning C4459: declaration of 's_allocator' hides global declaration
+    BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC("-Wshadow");
+    static bx::DefaultAllocator s_allocator;
+    return &s_allocator;
+    BX_PRAGMA_DIAGNOSTIC_POP();
+}
+
+bool image_load(const std::filesystem::path &&filePath, Image &&image_container)
+{
+    bx::Error error;
+    bx::FileReader reader;
+    auto ret = reader.open(filePath.string().data(), &error);
+    uint32_t fileSize = (uint32_t)bx::getSize(&reader);
+    const bgfx::Memory *mem = bgfx::alloc(static_cast<uint32_t>(fileSize));
+    ret = reader.read(mem->data, fileSize, &error);
+    reader.close();
+    const auto temp_image_container = bimg::imageParse(impl::getDefaultAllocator(), mem->data,
+                                                       mem->size, bimg::TextureFormat::Count, &error);
+    if (!temp_image_container)
+    {
+        // log error
+        return false;
+    }
+    image_container = std::move(*temp_image_container);
+    return true;
+}
+
+uint8_t get_texture_stage(const aiTextureType ai_texture_type)
+{
+    switch (ai_texture_type)
+    {
+        case aiTextureType_DIFFUSE:
+            return SAMPLER2D_DIFFUSE_STAGE;
+        case aiTextureType_BASE_COLOR:
+            return SAMPLER2D_ALBEDO_STAGE;
+        case aiTextureType_NORMALS:
+            return SAMPLER2D_NORMALS_STAGE;
+        case aiTextureType_AMBIENT_OCCLUSION:
+        case aiTextureType_LIGHTMAP:
+        case aiTextureType_AMBIENT:
+            return SAMPLER2D_AO_STAGE;
+        case aiTextureType_UNKNOWN:
+            return SAMPLER2D_ROUGH_METALLIC_STAGE;
+        case aiTextureType_EMISSIVE:
+            return SAMPLER2D_EMISSIVE_STAGE;
+        case aiTextureType_HEIGHT:
+            return SAMPLER2D_HEIGHT_STAGE;
+        case aiTextureType_OPACITY:
+            return SAMPLER2D_OPACITY_STAGE;
+        case aiTextureType_SPECULAR:
+            return SAMPLER2D_SPECULAR_STAGE;
+        default:
+        {
+            return SAMPLER2D_TEXTURE0_STAGE;
+        }
+    }
+}
+
+void process_textures(const aiMaterial *material, blackboard::core::resources::Model &&model)
+{
+    aiString texturePath;
+    auto &&images_map = model.meshes.back().images;
+    std::cout << ">>>> " << material->GetName().C_Str() << std::endl;
+    for (auto type = aiTextureType_NONE; type <= aiTextureType_UNKNOWN;
+         type = static_cast<aiTextureType>(type + 1))
+    {
+        //If there are any textures of the given type in the material
+        //        aiString baseColorFactor;
+        //        if(AI_SUCCESS == material->GetTexture(AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_BASE_COLOR_TEXTURE, &baseColorFactor))
+        //        {
+        //            std::cout << "AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_BASE_COLOR_FACTOR" << std::endl;
+        //        }
+
+        if (material->GetTextureCount(type) > 0)
+        {
+            //We only care about the first texture assigned we don't expect multiple to be assigned
+            material->GetTexture(type, 0, &texturePath);
+            std::cout << ">>>> " << Texture_type_names.at(get_texture_stage(type))
+                      << " PATH: " << texturePath.C_Str() << std::endl;
+            std::filesystem::path image_path = model.path() / texturePath.C_Str();
+            auto image_path_string = image_path.string();
+            std::replace(image_path_string.begin(), image_path_string.end(), '\\', '/');
+            image_path = {image_path_string};
+            assert(std::filesystem::exists(image_path));
+
+            Image image;
+            const auto success = image_load(std::move(image_path), std::forward<Image>(image));
+            if (success)
+            {
+                images_map.insert({get_texture_stage(type), std::move(image)});
+            }
+        }
+    }
+}
+
+void process_mesh(const aiMesh *ai_mesh, const aiScene *ai_scene,
+                  blackboard::core::resources::Model &&model)
+{
+    model.meshes.push_back({});
+    auto &&mesh = model.meshes.back();
     auto &vertices = mesh.vertices;
     auto &indices = mesh.indices;
-    auto &textures = mesh.textures;
 
-    std::span<aiVector3D> ai_vertices{ai_mesh->mVertices, ai_mesh->mNumVertices};
-    std::span<aiVector3D> ai_normals{ai_mesh->mNormals, ai_mesh->mNumVertices};
-    std::span<aiVector3D> ai_tangents{ai_mesh->mTangents, ai_mesh->mNumVertices};
-    std::span<aiVector3D> ai_bitangents{ai_mesh->mBitangents, ai_mesh->mNumVertices};
-    std::span<aiVector3D *> ai_texcoords{ai_mesh->mTextureCoords, ai_mesh->mNumVertices};
-    std::span<aiColor4D *> ai_colors{ai_mesh->mColors, ai_mesh->mNumVertices};
+    const auto total_vertices = ai_mesh->mNumVertices;
+    vertices.reserve(total_vertices);
+
+    std::span<aiVector3D> ai_vertices{ai_mesh->mVertices, total_vertices};
+    std::span<aiVector3D> ai_normals{ai_mesh->mNormals, total_vertices};
+    std::span<aiVector3D> ai_tangents{ai_mesh->mTangents, total_vertices};
+    std::span<aiVector3D> ai_bitangents{ai_mesh->mBitangents, total_vertices};
+    std::span<aiVector3D> ai_texcoords{ai_mesh->mTextureCoords[0], total_vertices};
+    std::span<aiColor4D> ai_colors{ai_mesh->mColors[0], total_vertices};
 
     // Vertices data
     for (auto &&[v, n, t, bt, tc, c] :
@@ -111,6 +237,8 @@ blackboard::core::resources::Mesh processMesh(aiMesh *ai_mesh, const aiScene *ai
     }
 
     // Indices
+    indices.reserve(ai_mesh->mNumFaces * 3);
+
     std::span<aiFace> ai_faces{ai_mesh->mFaces, ai_mesh->mNumFaces};
     for (auto &&face : ai_faces)
     {
@@ -121,13 +249,11 @@ blackboard::core::resources::Mesh processMesh(aiMesh *ai_mesh, const aiScene *ai
     }
 
     //Process material and texture info
-    //    aiMaterial *material = ai_scene->mMaterials[ai_mesh->mMaterialIndex];
-    //    textures = processTextures(material);
-
-    return std::move(mesh);
+    aiMaterial *material = ai_scene->mMaterials[ai_mesh->mMaterialIndex];
+    process_textures(material, std::forward<Model>(model));
 }
 
-void processNode(const aiNode *ai_node, const aiScene *ai_scene, Meshes &&meshes)
+void process_node(const aiNode *ai_node, const aiScene *ai_scene, Model &&model)
 {
     std::span<unsigned int> ai_node_mesh_indices{ai_node->mMeshes, ai_node->mNumMeshes};
     std::span<aiMesh *> ai_meshes{ai_scene->mMeshes, ai_scene->mNumMeshes};
@@ -135,19 +261,42 @@ void processNode(const aiNode *ai_node, const aiScene *ai_scene, Meshes &&meshes
     for (auto &&ai_mesh_index : ai_node_mesh_indices)
     {
         aiMesh *ai_mesh = ai_meshes[ai_mesh_index];
-        meshes.push_back(processMesh(ai_mesh, ai_scene));
-        meshes.back().transform = assimp_to_mat4(ai_node->mTransformation);
+        process_mesh(ai_mesh, ai_scene, std::forward<blackboard::core::resources::Model>(model));
+        model.meshes.back().transform = assimp_to_mat4(ai_node->mTransformation);
     }
 
     std::span<aiNode *> ai_children_nodes{ai_node->mChildren, ai_node->mNumChildren};
 
     for (auto &&ai_child_node : ai_children_nodes)
     {
-        processNode(ai_child_node, ai_scene, std::forward<Meshes>(meshes));
+        process_node(ai_child_node, ai_scene, std::forward<Model>(model));
     }
 }
 
 }    // namespace impl
+
+static std::filesystem::path app_base_path{};
+
+std::filesystem::path path()
+{
+#ifdef __APPLE__
+    return app_base_path;
+#else
+    return app_base_path / "Resources";
+#endif
+}
+
+void init(std::filesystem::path &&app_path)
+{
+    app_base_path = app_path;
+    using namespace entt::literals;
+    //    entt::meta<Texture_type>()
+    //      .type("Texture_type"_hs)
+    //      .data<Texture_type::Albedo>("Albedo"_hs)
+    //      .prop(meta::property_name_key, std::string{"Albedo"})
+    //      .data<Texture_type::Normal>("Normal"_hs)
+    //      .prop(meta::property_name_key, std::string{"Normal"});
+}
 
 entt::resource_cache<Model> models_cache;
 
@@ -169,8 +318,9 @@ struct Model_loader : entt::resource_loader<Model_loader, Model>
             return nullptr;
         }
 
-        auto model = std::make_shared<Model>();
-        impl::processNode(scene->mRootNode, scene, std::forward<Meshes>(model->meshes));
+        auto model = std::make_shared<Model>(path);
+        model->meshes.reserve(scene->mNumMeshes);
+        impl::process_node(scene->mRootNode, scene, std::forward<Model>(*model.get()));
 
         return model;
     }
@@ -178,10 +328,10 @@ struct Model_loader : entt::resource_loader<Model_loader, Model>
 
 entt::id_type load_model(std::filesystem::path &&path)
 {
-    const auto key = entt::hashed_string(core::components::Uuid().get().data());
+    const auto key = entt::hashed_string{path.string().c_str()};
     if (models_cache.load<Model_loader>(key, std::forward<std::filesystem::path>(path)))
     {
-        return key;
+        return key.value();
     }
 
     return entt::null;

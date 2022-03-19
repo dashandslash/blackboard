@@ -51,7 +51,7 @@
 #	define bvec4 bool4
 
 
-#	if BGFX_SHADER_LANGUAGE_HLSL > 4
+#    if BGFX_SHADER_LANGUAGE_HLSL > 400 || BGFX_SHADER_LANGUAGE_PSSL || BGFX_SHADER_LANGUAGE_SPIRV || BGFX_SHADER_LANGUAGE_METAL
 #		define REGISTER(_type, _reg) register(_type[_reg])
 #	else
 #		define REGISTER(_type, _reg) register(_type ## _reg)

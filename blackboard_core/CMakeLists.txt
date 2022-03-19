@@ -14,6 +14,7 @@ target_link_libraries(${PROJECT_NAME}
                       PUBLIC
                       assimp
                       bgfx
+                      bimg
                       bx
                       EnTT
                       glm

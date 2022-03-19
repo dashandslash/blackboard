@@ -1,6 +1,6 @@
 #include "program.h"
 
-#include <app/resources.h>
+#include <resources/resources.h>
 
 #include <array>
 #include <fstream>
@@ -24,6 +24,30 @@ constexpr auto shader_vertex_program_flags = " -p vs_5_0";
 constexpr auto shaderc_binary = "tools/win/shaderc.exe";
 #endif
 
+void extractIntegerWords(std::string str)
+{
+    std::stringstream ss;
+
+    /* Storing the whole string into string stream */
+    ss << str;
+
+    /* Running loop till the end of the stream */
+    std::string temp;
+    int found;
+    while (!ss.eof())
+    {
+        /* extracting word by word from stream */
+        ss >> temp;
+
+        /* Checking the given word is integer or not */
+        if (std::stringstream(temp) >> found)
+            std::cout << found << " ";
+
+        /* To save from space at the end of string */
+        temp = "";
+    }
+}
+
 bgfx::ShaderHandle loadShader(const std::filesystem::path &filePath)
 {
     if (std::filesystem::exists(filePath))
@@ -33,8 +57,7 @@ bgfx::ShaderHandle loadShader(const std::filesystem::path &filePath)
         const bgfx::Memory *mem = bgfx::alloc(static_cast<uint32_t>(fileSize) + 1);
         file.seekg(0, std::ios::beg);
         file.read(reinterpret_cast<char *>(mem->data), fileSize);
-        file.close();
-        auto handle = bgfx::createShader(mem);
+        const auto handle = bgfx::createShader(mem);
         if (isValid(handle))
         {
             bgfx::setName(handle, filePath.string().c_str());

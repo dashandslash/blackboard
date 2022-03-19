@@ -1,5 +1,6 @@
 #pragma once
 #include <bgfx/bgfx.h>
+#include <entt/container/dense_map.hpp>
 
 #include <filesystem>
 #include <string>
@@ -37,5 +38,6 @@ struct Program
     bgfx::ShaderHandle m_vsh;
     bgfx::ShaderHandle m_fsh;
     bgfx::ProgramHandle m_program;
+    entt::dense_map<std::string, uint8_t> uniform_samples_stage;
 };
 }    // namespace blackboard::core::renderer

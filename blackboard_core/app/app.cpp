@@ -37,6 +37,10 @@ App::App(const char *app_name, const renderer::Api renderer_api, const uint16_t 
     renderer::ImGui_Impl_sdl_bgfx_Init(m_window.imgui_view_id);
 
     ImGui_ImplSDL2_InitForMetal(m_window.window);
+
+    char *base_path = SDL_GetBasePath();
+
+    resources::init(base_path ? std::filesystem::path(base_path) : std::filesystem::path("/"));
 }
 
 void App::run()
