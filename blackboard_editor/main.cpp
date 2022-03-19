@@ -139,31 +139,32 @@ void render_ui()
     }
 
     // show the guizmo when an entity with transform comp is selected
-
+    ImGuizmo::SetOrthographic(false);
+    ImGuizmo::SetDrawlist();
+    ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, viewport_window_size.x,
+                      viewport_window_size.y);
     if (auto view = state.view<core::components::Transform, core::components::Selected>();
         view.front() != entt::null)
     {
         // Selected comp is an empty type
         auto &&[_, transform_comp] = *view.each().begin();
-        ImGuizmo::SetOrthographic(false);
-        ImGuizmo::SetDrawlist();
-        ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, viewport_window_size.x,
-                          viewport_window_size.y);
         auto transform = transform_comp.get_transform();
+        static glm::vec3 snap{1.0f, 1.0f, 1.0f};
         if (ImGuizmo::Manipulate(glm::value_ptr(cam.getViewMatrix()),
                                  glm::value_ptr(cam.getProjectionMatrix()), ImGuizmo::OPERATION::ROTATE,
-                                 ImGuizmo::LOCAL, glm::value_ptr(transform), nullptr, nullptr))
+                                 ImGuizmo::LOCAL, glm::value_ptr(transform), nullptr,
+                                 glm::value_ptr(snap)))
         {
             transform_comp.set_transform(transform);
         }
-
-        auto viewManipulateRight = ImGui::GetWindowPos().x + viewport_window_size.x;
-        auto viewManipulateTop = ImGui::GetWindowPos().y;
-
-        ImGuizmo::ViewManipulate(glm::value_ptr(cam.getViewMatrix()), cam.getPivotDistance(),
-                                 ImVec2(viewManipulateRight - 128, viewManipulateTop), ImVec2(128, 128),
-                                 0x10101010);
     }
+
+    auto viewManipulateRight = ImGui::GetWindowPos().x + viewport_window_size.x;
+    auto viewManipulateTop = ImGui::GetWindowPos().y;
+
+    ImGuizmo::ViewManipulate(glm::value_ptr(cam.getViewMatrix()), cam.getPivotDistance(),
+                             {viewManipulateRight - 128.0f, viewManipulateTop}, {128.0f, 128.0f},
+                             0x10101010);
 
     ImGui::End();
 }
