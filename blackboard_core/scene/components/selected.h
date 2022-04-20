@@ -1,6 +1,7 @@
 #pragma once
 
 #include <entt/core/type_traits.hpp>
+#include <entt/core/hashed_string.hpp>
 
 #include <string>
 

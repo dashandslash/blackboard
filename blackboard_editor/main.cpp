@@ -17,6 +17,7 @@
 #include <blackboard_core/scene/components/transform.h>
 #include <blackboard_core/state/state.h>
 #include <blackboard_core/utils/zip_iterator.h>
+#include <blackboard_core/command/command.h>
 
 #include <bgfx/bgfx.h>
 #include <entt/entt.hpp>
@@ -100,6 +101,7 @@ void init()
     }
 
     editor::init();
+    core::cmd::init(state);
 
     cam.setEyePoint({0.0, 0.0, -50.0f});
     cam.setPerspective(40.0f, 1280.0f / 720.0f, 0.1f, 100000.0f);
@@ -161,6 +163,8 @@ void render_ui()
 
     auto viewManipulateRight = ImGui::GetWindowPos().x + viewport_window_size.x;
     auto viewManipulateTop = ImGui::GetWindowPos().y;
+    auto &&[e, transform] = *state.view<core::components::Transform>().each().begin();
+
     ImGuizmo::ViewManipulate(glm::value_ptr(cam.getViewMatrix()), cam.getPivotDistance(),
                              {viewManipulateRight - 128.0f, viewManipulateTop}, {128.0f, 128.0f},
                              0x20202020);
@@ -172,7 +176,7 @@ void render_ui()
         // Selected comp is an empty type
         auto &&[_, transform_comp] = *view.each().begin();
         auto transform = transform_comp.get_transform();
-        static glm::vec3 snap{1.0f, 1.0f, 1.0f};
+        static glm::vec3 snap{5.0f, 5.0f, 5.0f};
         if (ImGuizmo::Manipulate(glm::value_ptr(cam.getViewMatrix()),
                                  glm::value_ptr(cam.getProjectionMatrix()), ImGuizmo::OPERATION::ROTATE,
                                  ImGuizmo::LOCAL, glm::value_ptr(transform), nullptr,

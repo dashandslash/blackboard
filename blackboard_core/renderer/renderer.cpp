@@ -30,13 +30,13 @@ bool init(Window &window, const Api renderer_api, const uint16_t width, const ui
     switch (renderer_api)
     {
         case Api::metal:
-            bgfx_init.type = bgfx::RendererType::Metal;    // auto choose renderer
+            bgfx_init.type = bgfx::RendererType::Metal;
             break;
         case Api::d3d11:
-            bgfx_init.type = bgfx::RendererType::Direct3D11;    // auto choose renderer
+            bgfx_init.type = bgfx::RendererType::Direct3D11;
             break;
         case Api::webgpu:
-            bgfx_init.type = bgfx::RendererType::WebGPU;    // auto choose renderer
+            bgfx_init.type = bgfx::RendererType::WebGPU;
             break;
         default:
             bgfx_init.type = bgfx::RendererType::Count;    // auto choose renderer

@@ -22,6 +22,12 @@ struct State
     {
         return m_registry.emplace_or_replace<Component>(entity, std::forward<Args>(args)...);
     }
+    
+    template<typename Component, typename... Args>
+    static decltype(auto) emplace_component_s(State &state, const entity_type entity, Args &&... args)
+    {
+        return state.m_registry.emplace_or_replace<Component>(entity, std::forward<Args>(args)...);
+    }
 
     template<typename Component, typename... Func>
     decltype(auto) patch(const entity_type entity, Func &&... func)
@@ -47,11 +53,11 @@ struct State
         return m_registry.all_of<Args...>(entity);
     }
 
-    template<typename... Args>
-    decltype(auto) get(const entity_type entity)
-    {
-        return m_registry.get<Args...>(entity);
-    }
+//    template<typename... Args>
+//    decltype(auto) get(const entity_type entity)
+//    {
+//        return m_registry.get<Args...>(entity);
+//    }
 
     template<typename... Args>
     decltype(auto) get(const entity_type entity) const
@@ -76,7 +82,7 @@ struct State
         return m_registry.clear<T...>();
     }
 
-    //private:
+private:
     entt::registry m_registry;
 };
 

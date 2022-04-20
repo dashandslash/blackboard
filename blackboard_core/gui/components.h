@@ -60,7 +60,7 @@ static bool draw_component(blackboard::core::State &state, const entt::entity en
 
     auto fn = [&state, &entity, &ui_function]() -> bool {
         ImGui::BeginGroup();
-        T &component = state.get<T>(entity);
+        const T &component = state.get<T>(entity);
         bool modified = ui_function(component);
         ImGui::EndGroup();
         return modified;

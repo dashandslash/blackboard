@@ -13,7 +13,38 @@
 
 #include <iostream>
 
+
+#include <algorithm>
+#include <map>
+#include <memory>
+#include <utility>
+#include <vector>
+#include <entt/core/hashed_string.hpp>
+#include <entt/core/type_info.hpp>
+#include <entt/core/utility.hpp>
+#include <entt/meta/container.hpp>
+#include <entt/meta/ctx.hpp>
+#include <entt/meta/factory.hpp>
+#include <entt/meta/meta.hpp>
+#include <entt/meta/pointer.hpp>
+#include <entt/meta/resolve.hpp>
+#include <entt/meta/template.hpp>
+
+#include <scene/components/name.h>
+#include <scene/components/transform.h>
+#include <state/state.h>
+#include <command/command.h>
+
 namespace blackboard::core {
+
+namespace cmd
+{
+
+    template<> void execute<cmd::a_command>(State &state, const cmd::a_command& cmd)
+    {
+        
+    }
+}
 
 App::App(const char *app_name, const renderer::Api renderer_api, const uint16_t width,
          const uint16_t height, const bool fullscreen)
@@ -41,6 +72,8 @@ App::App(const char *app_name, const renderer::Api renderer_api, const uint16_t 
     char *base_path = SDL_GetBasePath();
 
     resources::init(base_path ? std::filesystem::path(base_path) : std::filesystem::path("/"));
+    
+    using namespace entt::literals;
 }
 
 void App::run()
@@ -77,8 +110,15 @@ void App::run()
                 const auto [drawable_width, drawable_height] = m_window.get_size_in_pixels();
                 on_resize(drawable_width, drawable_height);
             }
+            if (event.type == SDL_MOUSEMOTION)
+            {
+                std::cout << event.motion.xrel << std::endl;
+                std::cout << event.motion.yrel << std::endl;
+            }
         }
 
+        cmd::dispatch(std::move(core::get_state("default_state")));
+        
         renderer::ImGui_Impl_sdl_bgfx_NewFrame();
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();

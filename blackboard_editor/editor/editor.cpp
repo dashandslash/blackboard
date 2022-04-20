@@ -9,6 +9,7 @@
 #include <blackboard_core/scene/components/transform.h>
 #include <blackboard_core/scene/components/uuid.h>
 #include <blackboard_core/state/state.h>
+#include <blackboard_core/command/command.h>
 
 #include <SDL/SDL.h>
 #include <bgfx/bgfx.h>
@@ -219,38 +220,31 @@ void entities_window(core::State &state)
 
             // Name
             core::gui::draw_component<core::components::Name>(
-              state, selected, "Name", [&state](core::components::Name &component) {
-                  auto temp_name = component.value;
+              state, selected, "Name", [&state](core::components::Name component) {
 
-                  if (core::gui::draw_component_parameter("Name", [&state, &component, &temp_name]() {
-                          return ImGui::InputText("##name", &temp_name,
+                  if (core::gui::draw_component_parameter("Name", [&state, &component]() {
+                          return ImGui::InputText("##name", &component.value,
                                                   ImGuiInputTextFlags_EnterReturnsTrue);
                       }))
                   {
-                      state.patch<core::components::Name>(
-                        selected,
-                        [&state, &component, &temp_name](auto &name) { name.value = temp_name; });
+                      core::cmd::queue.push_back(core::cmd::Replace<core::components::Name>{selected, std::move(component)});
                       return true;
                   }
                   return false;
               });
 
-            auto draw_transform_fn = [&](core::components::Transform &tr) -> bool {
-                auto vec3_rotation = glm::degrees(glm::eulerAngles(tr.rotation));
+            auto draw_transform_fn = [&](core::components::Transform component) -> bool {
                 auto modified =
                   core::gui::draw_component_parameter("Translation", &core::gui::vec3_control,
-                                                      tr.translation, 0.0f, -180.0f, 180.0f, 150.0f);
+                                                      component.translation, 0.0f, -180.0f, 180.0f, 150.0f);
                 modified |= core::gui::draw_component_parameter(
-                  "Rotation", &core::gui::vec3_control, vec3_rotation, 0.0f, -180.0f, 180.0f, 150.0f);
+                  "Rotation", &core::gui::vec3_control, component.rotation, 0.0f, -180.0f, 180.0f, 150.0f);
                 modified |= core::gui::draw_component_parameter(
-                  "Scale", &core::gui::vec3_control, tr.scale, 1.0f, -180.0f, 180.0f, 150.0f);
+                  "Scale", &core::gui::vec3_control, component.scale, 1.0f, -180.0f, 180.0f, 150.0f);
 
                 if (modified)
                 {
-                    state.patch<core::components::Transform>(
-                      selected, [&](core::components::Transform &tr) {
-                          tr.rotation = glm::quat(glm::radians(vec3_rotation));
-                      });
+                    core::cmd::queue.push_back(core::cmd::Replace<core::components::Transform>{selected, std::move(component)});
                 }
                 return modified;
             };
