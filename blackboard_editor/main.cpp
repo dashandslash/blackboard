@@ -67,7 +67,7 @@ void init()
 
     if (core::resources::is_valid_model_key(model_key))
     {
-        for (auto &&mesh : core::resources::get_model_ref(model_key).meshes)
+        for (auto &&mesh : core::resources::get_model(model_key)->meshes)
         {
             mesh.vbh = bgfx::createVertexBuffer(
               bgfx::makeRef(mesh.vertices.data(),
@@ -190,7 +190,7 @@ void app_update()
 
           core::renderer::material_manager().set_uniform(&uniform);
 
-          for (auto &&mesh : core::resources::get_model_ref(key).meshes)
+          for (auto &&mesh : core::resources::get_model(key)->meshes)
           {
               bgfx::setVertexBuffer(0, mesh.vbh);
               bgfx::setIndexBuffer(mesh.ibh);

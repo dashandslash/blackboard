@@ -7,7 +7,6 @@
 #include <entt/core/hashed_string.hpp>
 #include <entt/entity/entity.hpp>
 #include <entt/resource/cache.hpp>
-#include <entt/resource/handle.hpp>
 #include <entt/resource/loader.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -149,11 +148,12 @@ void processNode(const aiNode *ai_node, const aiScene *ai_scene, Meshes &&meshes
 
 }    // namespace impl
 
-entt::resource_cache<Model> models_cache;
 
-struct Model_loader : entt::resource_loader<Model_loader, Model>
+struct Model_loader
 {
-    std::shared_ptr<Model> load(std::filesystem::path &&path) const
+    using result_type = std::shared_ptr<Model>;
+    
+    result_type operator()(std::filesystem::path &&path) const
     {
         if (!std::filesystem::exists(path))
         {
@@ -176,10 +176,12 @@ struct Model_loader : entt::resource_loader<Model_loader, Model>
     }
 };
 
+entt::resource_cache<Model, Model_loader> models_cache;
+    
 entt::id_type load_model(std::filesystem::path &&path)
 {
     const auto key = entt::hashed_string(core::components::Uuid().get().data());
-    if (models_cache.load<Model_loader>(key, std::forward<std::filesystem::path>(path)))
+    if (models_cache.force_load(key, std::forward<std::filesystem::path>(path)).second)
     {
         return key;
     }
@@ -187,14 +189,13 @@ entt::id_type load_model(std::filesystem::path &&path)
     return entt::null;
 }
 
-Model &get_model_ref(const entt::id_type key)
+std::shared_ptr<Model> get_model(const entt::id_type key)
 {
-    return models_cache.handle(key).get();
-}
-
-entt::resource_handle<Model> get_model_handle(const entt::id_type key)
-{
-    return models_cache.handle(key);
+    if(models_cache.contains(key))
+    {
+       return models_cache[key].handle();
+    }
+    return nullptr;
 }
 
 bool is_valid_model_key(const entt::id_type key)
@@ -202,4 +203,4 @@ bool is_valid_model_key(const entt::id_type key)
     return key != entt::null && models_cache.contains(key);
 }
 
-}    // namespace blackboard::core::resources
+}   // namespace blackboard::core::resources
