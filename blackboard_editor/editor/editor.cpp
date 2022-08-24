@@ -75,9 +75,9 @@ void reflection_inspector()
                 ImGui::TableNextColumn();
                 ImGui::Text("%u", entt::to_integral(type_index));
                 ImGui::TableNextColumn();
-                ImGui::Text("%s", info.name.data());
+                ImGui::Text("%s", info.name.c_str());
                 ImGui::TableNextColumn();
-                ImGui::Text("%s", info.type_info.name().data());
+                ImGui::Text("%s", std::string(info.type_info.name()).c_str());
 
                 for (const auto &[state_name, state] : states)
                 {
